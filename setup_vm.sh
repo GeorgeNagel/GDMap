@@ -1,5 +1,5 @@
 # Remove the virtualenv, if it exists
-rm -r virtualenv
+rm -fr virtualenv
 # Create the virtualenv
 virtualenv virtualenv
 # Install the python requirements
