@@ -10,4 +10,7 @@ $ virtualenv/bin/pip install -r requirements_host.txt
 ```
 $ vagrant up
 ```
-
+## Create the python virtual environment and install dependencies
+```
+$ virtualenv/bin/fab setup_vm
+```
