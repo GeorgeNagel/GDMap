@@ -1,7 +1,10 @@
-# Python virtualenv
+# Python virtualenv (vagrant box)
 virtualenv
+# Python virtualenv (host machine)
+hostenv
 # Mac finder files
 *.DS_Store
 # Python compiled files
 *.pyc
-
+# Vagrant files
+.vagrant
