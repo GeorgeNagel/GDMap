@@ -12,5 +12,5 @@ $ vagrant up
 ```
 ## Create the python virtual environment and install dependencies
 ```
-$ virtualenv/bin/fab setup_vm
+$ virtualenv/bin/fab reset_virtualenv
 ```

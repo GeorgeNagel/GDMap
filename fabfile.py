@@ -7,6 +7,6 @@ env.key_filename = result.split()[1]
 
 @task
 @hosts(['vagrant@127.0.0.1:2000'])
-def setup_vm():
+def reset_virtualenv():
     with cd('gdmap'):
-        run('sh setup_vm.sh')
+        run('sh reset_virtualenv.sh')
