@@ -7,5 +7,9 @@ exec {
                     user => root
 }
 
-class { 'pip': }
+class { 'python':
+  version => 'system',
+  virtualenv => true,
+  pip => true,
+}
 
