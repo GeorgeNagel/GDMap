@@ -60,8 +60,9 @@ def internetarchive_search(collection='GratefulDead',
             break
     return docs
 
-docs = internetarchive_search(collection='GratefulDead', per_page=100)
-with open('shows.json', 'w') as fout:
-    # Write a pretty print of the json results to file
-    docs_json = json.dumps(docs, indent=4, sort_keys=True)
-    fout.write(docs_json)
+if __name__ == '__main__':
+    docs = internetarchive_search(collection='GratefulDead', per_page=100)
+    with open('shows.json', 'w') as fout:
+        # Write a pretty print of the json results to file
+        docs_json = json.dumps(docs, indent=4, sort_keys=True)
+        fout.write(docs_json)
