@@ -1,0 +1,51 @@
+import json
+import logging
+import time
+
+import requests
+import requests_cache
+
+from download_shows import show_identifiers
+
+logging.basicConfig(level=logging.INFO)
+
+# 1 month cache expiration
+cache_expiration_seconds = 2419200
+requests_cache.install_cache('cache',
+                             backend='sqlite',
+                             expire_after=cache_expiration_seconds)
+
+base_url = 'https://archive.org/details'
+
+
+def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
+    show_ids = show_identifiers(**kwargs)
+    details = []
+    errors = 0
+    for id_ in show_ids:
+        url = "%s/%s&output=json" % (base_url, id_)
+        # Get the details json response
+        logging.info("Requesting: %s" % url)
+        response = requests.get(url)
+        response_dict = response.json()
+        status = response.status_code
+        logging.debug("Response (%d): %s" % (status, response_dict))
+        if status == 200:
+            # Add the details to the ongoing collection
+            details.append(response_dict)
+        else:
+            logging.error("Error (%d) downloading: %s" % (status, url))
+            errors += 1
+            if errors > max_errors:
+                raise Exception("Max Requests errors exceeded: %d" % errors)
+
+        # Don't hit their api too hard too fast
+        time.sleep(crawl_delay_seconds)
+    return details
+
+if __name__ == '__main__':
+    details = download_show_details()
+    with open('details.json', 'w') as fout:
+        # Write a pretty print of the json results to file
+        docs_json = json.dumps(details, indent=4, sort_keys=True)
+        fout.write(docs_json)

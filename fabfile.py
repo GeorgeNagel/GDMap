@@ -24,6 +24,13 @@ def download_shows():
 
 @task
 @hosts([host])
+def download_details():
+    with cd('gdmap'):
+        run('virtualenv/bin/python download_show_details.py')
+
+
+@task
+@hosts([host])
 def test():
     """Run the unit tests."""
     with cd('gdmap'):

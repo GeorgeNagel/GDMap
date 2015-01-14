@@ -21,7 +21,7 @@ start = 0
 
 
 def internetarchive_search(collection='GratefulDead',
-                           per_page=50,
+                           per_page=100,
                            start=0,
                            crawl_delay_seconds=1,
                            max_errors=10,
@@ -33,9 +33,9 @@ def internetarchive_search(collection='GratefulDead',
         query = "collection:(%s)&rows=%d&start=%d" % (
             collection, per_page, start)
         url = "%s?q=%s&output=json" % (base_url, query)
-        logging.info("Requesting: %s" % url)
 
         # Get the search api response
+        logging.info("Requesting: %s" % url)
         response = requests.get(url)
         response_dict = response.json()
         status = response.status_code
@@ -60,8 +60,14 @@ def internetarchive_search(collection='GratefulDead',
             break
     return docs
 
+
+def show_identifiers(**kwargs):
+    docs = internetarchive_search(**kwargs)
+    ids = [doc['identifier'] for doc in docs]
+    return ids
+
 if __name__ == '__main__':
-    docs = internetarchive_search(collection='GratefulDead', per_page=100)
+    docs = internetarchive_search()
     with open('shows.json', 'w') as fout:
         # Write a pretty print of the json results to file
         docs_json = json.dumps(docs, indent=4, sort_keys=True)
