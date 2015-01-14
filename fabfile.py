@@ -10,3 +10,10 @@ env.key_filename = result.split()[1]
 def reset_virtualenv():
     with cd('gdmap'):
         run('sh reset_virtualenv.sh')
+
+
+@task
+@hosts(['vagrant@127.0.0.1:2000'])
+def download_shows():
+    with cd('gdmap'):
+        run('virtualenv/bin/python download_shows.py')

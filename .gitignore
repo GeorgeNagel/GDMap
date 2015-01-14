@@ -2,9 +2,14 @@
 virtualenv
 # Python virtualenv (host machine)
 hostenv
-# Mac finder files
-*.DS_Store
 # Python compiled files
 *.pyc
+
+# Mac finder files
+*.DS_Store
+
 # Vagrant files
 .vagrant
+
+# Sqlite files
+*.sqlite
