@@ -13,3 +13,8 @@ class { 'python':
   pip => true,
 }
 
+class { 'mongodb::server':
+  port    => 27017,
+  verbose => true,
+  bind_ip => ["0.0.0.0"],
+}

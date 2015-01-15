@@ -8,22 +8,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "hashicorp/precise32"
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-
   # Forward ssh
   config.vm.network :forwarded_port, id: "ssh", guest:22, host: 2000
+  # Forward mongodb
+  config.vm.network :forwarded_port, id: "mongo", guest: 27017, host: 27017, auto_correct: true
 
   # Share the folder contents with the guest machine
   config.vm.synced_folder ".", "/home/vagrant/gdmap", owner: "vagrant", group: "vagrant"
 
-  # Enable provisioning with Puppet stand alone.  Puppet manifests
-  # are contained in a directory path relative to this Vagrantfile.
-  # You will need to create the manifests directory and a manifest in
-  # the file default.pp in the manifests_path directory.
-  #
+  # Provision with Puppet
   config.vm.provision "puppet" do |puppet|
     puppet.manifests_path = "puppet"
     puppet.manifest_file  = "manifest.pp"
