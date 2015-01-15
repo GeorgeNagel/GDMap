@@ -19,24 +19,38 @@ cache = requests_cache.core.get_cache()
 base_url = 'https://archive.org/details'
 
 
+class APIException(Exception):
+    pass
+
+
+def internetarchive_json_api(url):
+    """Download details for an individual show."""
+    # Get the details json response
+    logging.info("Requesting: %s" % url)
+    cached = cache.has_url(url)
+    response = requests.get(url)
+    response_dict = response.json()
+    status = response.status_code
+    logging.info("Response %d Cached? %s" % (status, cached))
+    if status == 200:
+        # Add the details to the ongoing collection
+        return response_dict
+    else:
+        raise APIException("Error (%d) downloading: %s" % (status, url))
+
+
 def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
     show_ids = show_identifiers(**kwargs)
     details = []
     errors = 0
     for id_ in show_ids:
         url = "%s/%s&output=json" % (base_url, id_)
-        # Get the details json response
-        logging.info("Requesting: %s" % url)
         cached = cache.has_url(url)
-        response = requests.get(url)
-        response_dict = response.json()
-        status = response.status_code
-        logging.info("Response %d Cached? %s" % (status, cached))
-        if status == 200:
-            # Add the details to the ongoing collection
+        try:
+            response_dict = internetarchive_json_api(url, **kwargs)
             details.append(response_dict)
-        else:
-            logging.error("Error (%d) downloading: %s" % (status, url))
+        except APIException as e:
+            logging.error(e)
             errors += 1
             if errors > max_errors:
                 raise Exception("Max Requests errors exceeded: %d" % errors)
