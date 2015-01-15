@@ -7,3 +7,6 @@
 [submodule "puppet/modules/mongodb"]
 	path = puppet/modules/mongodb
 	url = https://github.com/puppetlabs/puppetlabs-mongodb
+[submodule "puppet/modules/elasticsearch"]
+	path = puppet/modules/elasticsearch
+	url = https://github.com/elasticsearch/puppet-elasticsearch
