@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 # 1 month cache expiration
 cache_expiration_seconds = 2419200
 requests_cache.install_cache('cache',
-                             backend='sqlite',
+                             backend='mongo',
                              expire_after=cache_expiration_seconds)
 cache = requests_cache.core.get_cache()
 
