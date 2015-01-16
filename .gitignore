@@ -11,5 +11,3 @@ hostenv
 # Vagrant files
 .vagrant
 
-# Sqlite files
-*.sqlite
