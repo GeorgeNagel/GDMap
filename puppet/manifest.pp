@@ -19,7 +19,8 @@ class { 'mongodb::server':
   bind_ip => ["0.0.0.0"],
 }
 
-class our_elasticsearch($version='0.90.3') {
+# See https://github.com/elasticsearch/puppet-elasticsearch/issues/39
+class our_elasticsearch($version='1.4.2') {
 
   # We couldn't simply rely on the 'elasticsearch' module from:
   # https://github.com/elasticsearch/puppet-elasticsearch because it requires your desired
