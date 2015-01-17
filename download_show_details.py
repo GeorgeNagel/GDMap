@@ -5,7 +5,7 @@ import time
 import requests
 import requests_cache
 
-from download_shows import show_identifiers
+from download_shows import show_identifiers_from_file
 
 logging.basicConfig(level=logging.INFO)
 
@@ -40,7 +40,7 @@ def internetarchive_json_api(url):
 
 
 def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
-    show_ids = show_identifiers(**kwargs)
+    show_ids = show_identifiers_from_file()
     details = []
     errors = 0
     for id_ in show_ids:

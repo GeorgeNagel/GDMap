@@ -1,5 +1,5 @@
-import json
 import logging
+import os
 import time
 
 import requests
@@ -19,6 +19,8 @@ collection = "GratefulDead"
 per_page = 100
 crawl_delay_seconds = 1
 start = 0
+
+OUTPUT_FILENAME = "shows.txt"
 
 
 def internetarchive_search(collection='GratefulDead',
@@ -70,9 +72,20 @@ def show_identifiers(**kwargs):
     ids = [doc['identifier'] for doc in docs]
     return ids
 
+
+def show_identifiers_from_file():
+    if os.path.exists(OUTPUT_FILENAME):
+        ids = []
+        with open(OUTPUT_FILENAME, 'r') as fin:
+            for line in fin:
+                id_ = line.strip()
+                ids.append(id_)
+        return ids
+    else:
+        raise Exception("%s does not exist." % OUTPUT_FILENAME)
+
 if __name__ == '__main__':
-    docs = internetarchive_search()
-    with open('shows.json', 'w') as fout:
-        # Write a pretty print of the json results to file
-        docs_json = json.dumps(docs, indent=4, sort_keys=True)
-        fout.write(docs_json)
+    ids = show_identifiers()
+    with open(OUTPUT_FILENAME, 'w') as fout:
+        for id_ in ids:
+            fout.write("%s\n" % id_)
