@@ -1,11 +1,16 @@
-import json
 import logging
+import os
 import time
 
 import requests
 import requests_cache
+from mongoengine import connect
 
 from download_shows import show_identifiers_from_file
+from models import Song
+
+from settings import MONGO_DATABASE_NAME
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,6 +22,10 @@ requests_cache.install_cache('cache',
 cache = requests_cache.core.get_cache()
 
 base_url = 'https://archive.org/details'
+
+
+# Establish the connection to the database
+connect(MONGO_DATABASE_NAME)
 
 
 class APIException(Exception):
@@ -39,6 +48,40 @@ def internetarchive_json_api(url):
         raise APIException("Error (%d) downloading: %s" % (status, url))
 
 
+def songs_from_details(details_dict):
+    """Returns a list of Song documents from a details dict."""
+    songs = []
+    show_path = details_dict['dir']
+    # Get the show id from the path
+    show_id = show_path.split('/items/')[-1]
+    for file_ in details_dict['files']:
+        try:
+            file_dict = details_dict['files'][file_]
+            logging.debug("FILE DICT (%s, %s): %s" % (
+                show_id, file_, file_dict)
+            )
+            _, extension = os.path.splitext(file_)
+            if extension in ['.mp3', '.flac', '.ogg', '.shn']:
+                # This is a song file
+                if file_dict['source'] == 'original':
+                    # We only care about one set of files, so just
+                    # index the original files
+                    song_data = {
+                        'show_id': show_id,
+                        'filename': file_.strip('/'),
+                        'album': file_dict['album'],
+                        'sha1': file_dict['sha1'],
+                        'title': file_dict['title'],
+                        'track': int(file_dict['track'])
+                    }
+                    song = Song(**song_data)
+                    logging.debug("Song data: %s" % song_data)
+                    songs.append(song)
+        except KeyError as e:
+            logging.warning("Bad data in %s%s: %s" % (show_id, file_, e))
+    return songs
+
+
 def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
     show_ids = show_identifiers_from_file()
     details = []
@@ -48,7 +91,9 @@ def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
         cached = cache.has_url(url)
         try:
             response_dict = internetarchive_json_api(url, **kwargs)
-            details.append(response_dict)
+            songs = songs_from_details(response_dict)
+            for song in songs:
+                song.save()
         except APIException as e:
             logging.error(e)
             errors += 1
@@ -61,8 +106,4 @@ def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
     return details
 
 if __name__ == '__main__':
-    details = download_show_details()
-    with open('details.json', 'w') as fout:
-        # Write a pretty print of the json results to file
-        docs_json = json.dumps(details, indent=4, sort_keys=True)
-        fout.write(docs_json)
+    download_show_details()

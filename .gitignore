@@ -11,3 +11,5 @@ hostenv
 # Vagrant files
 .vagrant
 
+# Ignore text files
+*.txt
