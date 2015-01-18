@@ -1,4 +1,5 @@
 from fabric.api import run, hosts, task, env, local, cd
+from fabric.context_managers import shell_env
 
 # Trick to get the ssh key
 result = local('vagrant ssh-config | grep IdentityFile', capture=True)
@@ -34,4 +35,5 @@ def download_songs():
 def test():
     """Run the unit tests."""
     with cd('gdmap'):
-        run('virtualenv/bin/nosetests -s')
+        with shell_env(TESTING='1'):
+            run('virtualenv/bin/nosetests -s')

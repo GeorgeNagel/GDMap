@@ -1,1 +1,2 @@
 MONGO_DATABASE_NAME = 'gdmap'
+MONGO_CACHE_NAME = 'cache'

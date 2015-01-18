@@ -5,6 +5,7 @@ import unittest
 from mock import Mock, patch
 
 from download_songs import download_songs
+from tests.utils import mongo_clean
 
 fixtures_dir = 'tests/fixtures'
 
@@ -18,6 +19,7 @@ class TestDownloadShows(unittest.TestCase):
             fixture_json = json.loads(fin.read())
         return fixture_json
 
+    @mongo_clean
     def test_download_songs(self):
         # Mock the response
         mock_response = Mock()
