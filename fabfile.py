@@ -24,9 +24,9 @@ def download_shows():
 
 @task
 @hosts([host])
-def download_details():
+def download_songs():
     with cd('gdmap'):
-        run('virtualenv/bin/python download_show_details.py')
+        run('virtualenv/bin/python download_songs.py')
 
 
 @task

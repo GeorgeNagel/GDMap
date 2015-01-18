@@ -6,7 +6,7 @@ import requests
 import requests_cache
 from mongoengine import connect
 
-from download_shows import show_identifiers_from_file
+from download_shows import show_identifiers
 from models import Song
 
 from settings import MONGO_DATABASE_NAME
@@ -82,9 +82,9 @@ def songs_from_details(details_dict):
     return songs
 
 
-def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
-    show_ids = show_identifiers_from_file()
-    details = []
+def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
+    """Download song information and save to mongo."""
+    show_ids = show_identifiers(from_file=True)
     errors = 0
     for id_ in show_ids:
         url = "%s/%s&output=json" % (base_url, id_)
@@ -103,7 +103,6 @@ def download_show_details(crawl_delay_seconds=1, max_errors=10, **kwargs):
         if not cached:
             # Don't hit their api too hard too fast
             time.sleep(crawl_delay_seconds)
-    return details
 
 if __name__ == '__main__':
-    download_show_details()
+    download_songs()

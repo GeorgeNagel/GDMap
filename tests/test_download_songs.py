@@ -4,7 +4,7 @@ import unittest
 
 from mock import Mock, patch
 
-from download_show_details import download_show_details
+from download_songs import download_songs
 
 fixtures_dir = 'tests/fixtures'
 
@@ -18,7 +18,7 @@ class TestDownloadShows(unittest.TestCase):
             fixture_json = json.loads(fin.read())
         return fixture_json
 
-    def test_download_shows(self):
+    def test_download_songs(self):
         # Mock the response
         mock_response = Mock()
         mock_attrs = {
@@ -27,14 +27,10 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('download_show_details.requests.get') as get_mock:
+        with patch('download_songs.requests.get') as get_mock:
             # Patch show_identifiers() to return an id without making calls
-            with patch('download_show_details.show_identifiers') as ids_mock:
+            with patch('download_songs.show_identifiers') as ids_mock:
                 ids_mock.return_value = ['abc123']
                 get_mock.return_value = mock_response
 
-                details = download_show_details()
-                self.assertEqual(len(details), 1)
-                self.assertEqual(
-                    details[0]['item']['downloads'], 34913
-                )
+                download_songs()

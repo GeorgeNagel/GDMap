@@ -67,22 +67,23 @@ def internetarchive_search(collection='GratefulDead',
     return docs
 
 
-def show_identifiers(**kwargs):
-    docs = internetarchive_search(**kwargs)
-    ids = [doc['identifier'] for doc in docs]
-    return ids
-
-
-def show_identifiers_from_file():
-    if os.path.exists(OUTPUT_FILENAME):
-        ids = []
-        with open(OUTPUT_FILENAME, 'r') as fin:
-            for line in fin:
-                id_ = line.strip()
-                ids.append(id_)
-        return ids
+def show_identifiers(from_file=False, **kwargs):
+    if from_file:
+        # Just load whatever ids are currently stored in file
+        if os.path.exists(OUTPUT_FILENAME):
+            ids = []
+            with open(OUTPUT_FILENAME, 'r') as fin:
+                for line in fin:
+                    id_ = line.strip()
+                    ids.append(id_)
+            return ids
+        else:
+            raise Exception("%s does not exist." % OUTPUT_FILENAME)
     else:
-        raise Exception("%s does not exist." % OUTPUT_FILENAME)
+        # Make the live requests
+        docs = internetarchive_search(**kwargs)
+        ids = [doc['identifier'] for doc in docs]
+        return ids
 
 if __name__ == '__main__':
     ids = show_identifiers()
