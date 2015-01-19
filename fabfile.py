@@ -32,6 +32,13 @@ def download_songs():
 
 @task
 @hosts([host])
+def index_songs():
+    with cd('gdmap'):
+        run('virtualenv/bin/python es_index.py')
+
+
+@task
+@hosts([host])
 def test():
     """Run the unit tests."""
     with cd('gdmap'):
