@@ -6,16 +6,15 @@ from mock import Mock, patch
 
 from gdmap.archive_api.download_songs import download_songs
 from gdmap.models import Song
+from gdmap.settings import TEST_FIXTURES_DIR
 from gdmap.tests.utils import mongo_clean
-
-fixtures_dir = 'gdmap/tests/fixtures'
 
 
 class TestDownloadShows(unittest.TestCase):
     def _mock_json(self):
         """A mock json() response method."""
         # Load the response fixture
-        fixture_path = os.path.join(fixtures_dir, 'gd_details_response.json')
+        fixture_path = os.path.join(TEST_FIXTURES_DIR, 'gd_details_response.json')
         with open(fixture_path, 'r') as fin:
             fixture_json = json.loads(fin.read())
         return fixture_json
