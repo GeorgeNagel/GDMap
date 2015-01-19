@@ -2,17 +2,9 @@ import logging
 import os
 import time
 
-import requests
-import requests_cache
+from archive_api.utils import cache, internetarchive_json_api, APIException
 
 logging.basicConfig(level=logging.INFO)
-
-# 1 week cache expiration
-cache_expiration_seconds = 604800
-requests_cache.install_cache('cache',
-                             backend='mongo',
-                             expire_after=cache_expiration_seconds)
-cache = requests_cache.core.get_cache()
 
 base_url = "https://archive.org/advancedsearch.php"
 collection = "GratefulDead"
@@ -37,39 +29,34 @@ def internetarchive_search(collection='GratefulDead',
             collection, per_page, start)
         url = "%s?q=%s&output=json" % (base_url, query)
 
-        # Get the search api response
-        logging.info("Requesting: %s" % url)
-        cached = cache.has_url(url)
-        response = requests.get(url)
-        response_dict = response.json()
-        status = response.status_code
-        logging.info("Response %d Cached? %s" % (status, cached))
-
-        if status == 200:
+        try:
+            cached = cache.has_url(url)
+            # Get the search api response
+            response_dict = internetarchive_json_api(url)
             # Add the returned documents to the ongoing list
             requested_docs = response_dict['response']['docs']
-            if not requested_docs:
-                # We've passed the last page
-                break
             docs.extend(requested_docs)
-        else:
-            logging.error("Error (%d) downloading: %s" % (status, url))
+        except APIException as e:
+            logging.error(e)
             errors += 1
             if errors > max_errors:
                 raise Exception("Max Requests errors exceeded: %d" % errors)
 
+        # Increment the page for the next search
         start = start + per_page
         if not cached:
             # We did not just hit our cache, so be a good neighbor and sleep
             time.sleep(crawl_delay_seconds)
-        if stop and start >= stop:
+        # Exit after you have the item at index 'stop'
+        if stop is not None and start >= stop:
             break
     return docs
 
 
 def show_identifiers(from_file=False, **kwargs):
+    """Return a list of internetarchive show ids."""
     if from_file:
-        # Just load whatever ids are currently stored in file
+        # Load whatever ids are currently stored in file
         if os.path.exists(OUTPUT_FILENAME):
             ids = []
             with open(OUTPUT_FILENAME, 'r') as fin:

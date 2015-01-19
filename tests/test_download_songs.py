@@ -30,7 +30,7 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('archive_api.download_songs.requests.get') as get_mock:
+        with patch('archive_api.utils.requests.get') as get_mock:
             # Patch show_identifiers() to return an id without making calls
             with patch('archive_api.download_songs.show_identifiers') as ids_mock:
                 ids_mock.return_value = ['abc123']
