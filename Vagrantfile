@@ -12,6 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, id: "ssh", guest:22, host: 2000
   # Forward mongodb
   config.vm.network :forwarded_port, id: "mongo", guest: 27017, host: 27017, auto_correct: true
+  config.vm.network :forwarded_port, id: "site", guest: 5000, host: 5000
 
   # Share the folder contents with the guest machine
   config.vm.synced_folder ".", "/home/vagrant/gdmap", owner: "vagrant", group: "vagrant"

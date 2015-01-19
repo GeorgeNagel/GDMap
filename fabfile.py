@@ -4,6 +4,7 @@ from fabric.context_managers import shell_env
 # Trick to get the ssh key
 result = local('vagrant ssh-config | grep IdentityFile', capture=True)
 env.key_filename = result.split()[1]
+env.gdmap_path = '/home/vagrant/gdmap'
 
 host = 'vagrant@127.0.0.1:2000'
 
@@ -34,7 +35,8 @@ def download_songs():
 @hosts([host])
 def index_songs():
     with cd('gdmap'):
-        run('virtualenv/bin/python gdmap/es_index.py')
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/es_index.py')
 
 
 @task
@@ -45,3 +47,12 @@ def test():
         with shell_env(TESTING='1'):
             run('virtualenv/bin/flake8 gdmap')
             run('virtualenv/bin/nosetests gdmap -s')
+
+
+@task
+@hosts([host])
+def server():
+    """Run the unit tests."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/app.py')
