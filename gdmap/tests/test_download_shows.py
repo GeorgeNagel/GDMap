@@ -4,9 +4,9 @@ import unittest
 
 from mock import Mock, patch
 
-from archive_api.download_shows import internetarchive_search
+from gdmap.archive_api.download_shows import internetarchive_search
 
-fixtures_dir = 'tests/fixtures'
+fixtures_dir = 'gdmap/tests/fixtures'
 
 
 class TestDownloadShows(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('archive_api.utils.requests.get') as get_mock:
+        with patch('gdmap.archive_api.utils.requests.get') as get_mock:
             get_mock.return_value = mock_response
 
             docs = internetarchive_search(stop=1)

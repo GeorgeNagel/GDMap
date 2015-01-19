@@ -5,10 +5,10 @@ import time
 
 from mongoengine import connect
 
-from archive_api.utils import cache, internetarchive_json_api, APIException
-from download_shows import show_identifiers
-from models import Song
-from settings import MONGO_DATABASE_NAME
+from gdmap.archive_api.utils import cache, internetarchive_json_api, APIException
+from gdmap.archive_api.download_shows import show_identifiers
+from gdmap.models import Song
+from gdmap.settings import MONGO_DATABASE_NAME
 
 
 logging.basicConfig(level=logging.INFO)

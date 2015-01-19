@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from archive_api.utils import cache, internetarchive_json_api, APIException
+from gdmap.archive_api.utils import cache, internetarchive_json_api, APIException
 
 logging.basicConfig(level=logging.INFO)
 

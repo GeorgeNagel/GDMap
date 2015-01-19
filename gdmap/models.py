@@ -1,6 +1,6 @@
 from mongoengine import Document, fields, connect
 
-from settings import MONGO_DATABASE_NAME
+from gdmap.settings import MONGO_DATABASE_NAME
 
 # Establish the connection to the database
 connect(MONGO_DATABASE_NAME)

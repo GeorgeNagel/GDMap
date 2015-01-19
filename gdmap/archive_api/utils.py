@@ -3,7 +3,7 @@ import requests
 
 import requests_cache
 
-from settings import CACHE_EXPIRATION_SECONDS
+from gdmap.settings import CACHE_EXPIRATION_SECONDS
 
 requests_cache.install_cache('cache',
                              backend='mongo',

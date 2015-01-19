@@ -3,7 +3,7 @@ import logging
 from functools import wraps
 from mongoengine import connect
 
-from settings import MONGO_DATABASE_NAME, MONGO_CACHE_NAME
+from gdmap.settings import MONGO_DATABASE_NAME, MONGO_CACHE_NAME
 
 db = connect(MONGO_DATABASE_NAME)
 cache_db = connect(MONGO_CACHE_NAME)

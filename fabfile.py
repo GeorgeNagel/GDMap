@@ -20,21 +20,21 @@ def reset_virtualenv():
 @hosts([host])
 def download_shows():
     with cd('gdmap'):
-        run('virtualenv/bin/python download_shows.py')
+        run('virtualenv/bin/python gdmap/download_shows.py')
 
 
 @task
 @hosts([host])
 def download_songs():
     with cd('gdmap'):
-        run('virtualenv/bin/python download_songs.py')
+        run('virtualenv/bin/python gdmap/download_songs.py')
 
 
 @task
 @hosts([host])
 def index_songs():
     with cd('gdmap'):
-        run('virtualenv/bin/python es_index.py')
+        run('virtualenv/bin/python gdmap/es_index.py')
 
 
 @task
@@ -43,4 +43,5 @@ def test():
     """Run the unit tests."""
     with cd('gdmap'):
         with shell_env(TESTING='1'):
-            run('virtualenv/bin/nosetests -s')
+            run('virtualenv/bin/flake8 gdmap')
+            run('virtualenv/bin/nosetests gdmap -s')
