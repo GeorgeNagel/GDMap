@@ -6,3 +6,5 @@ CACHE_EXPIRATION_SECONDS = 2419200
 
 # Show flask debugging output
 FLASK_DEBUG = False
+
+ELASTICSEARCH_INDEX_NAME = 'gdmap'

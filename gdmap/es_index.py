@@ -4,9 +4,9 @@ import logging
 from elasticsearch import Elasticsearch, ConnectionTimeout
 
 from gdmap.models import Song
+from gdmap.settings import ELASTICSEARCH_INDEX_NAME
 
 es = Elasticsearch()
-index_name = 'gdmap'
 doc_type = 'song'
 
 
@@ -16,7 +16,7 @@ def index_song(song_document):
     index_attempts = 0
     while index_attempts < 3:
         try:
-            es.create(index=index_name,
+            es.create(index=ELASTICSEARCH_INDEX_NAME,
                       doc_type=doc_type,
                       body=song_data,
                       timeout=100)
@@ -38,7 +38,7 @@ def index_song(song_document):
 def index_songs():
     """Index all of the songs into elasticsearch from data in mongo."""
     # Delete the entire index
-    es.indices.flush(index=index_name)
+    es.indices.flush(index=ELASTICSEARCH_INDEX_NAME)
     for song in Song.objects:
         index_song(song)
 

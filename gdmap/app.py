@@ -1,14 +1,20 @@
 from flask import Flask, render_template
 
-from gdmap.es_index import es
 from gdmap.settings import FLASK_DEBUG
+from gdmap.query import get_query_results
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    content = es.search(index="gdmap", body={"query": {"match_all": {}}})
+    content = get_query_results()
+    return render_template('base.html', content=content)
+
+
+@app.route('/<terms>')
+def terms_search(terms):
+    content = get_query_results(terms=terms)
     return render_template('base.html', content=content)
 
 if __name__ == '__main__':
