@@ -52,6 +52,9 @@ class TestDownloadShows(unittest.TestCase):
                         "_id": "a00830c80d1cad6279de17ddfac78c772686db4a",
                         "show_id": "gd90-07-18.neumann-fob.gardner.7358.sbeok.shnf",
                         "filename": "gd90-07-18d1t01.shn",
+                        # Embedded document representation of datetime
+                        'date': {'$date': 648259200000L},
+                        'location': 'Noblesville, IN',
                         "album": "1990-07-18 - Deer Creek Music Center",
                         "title": "Help On The Way",
                         "track": 1

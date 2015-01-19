@@ -26,3 +26,9 @@ class Song(Document):
     track = fields.IntField(
         help_text="The order of the track in the set. 1-indexed.",
         required=True)
+    date = fields.DateTimeField(
+        help_text="Date of the concert.",
+        required=True)
+    location = fields.StringField(
+        help_text="Location of the concert.",
+        required=True)

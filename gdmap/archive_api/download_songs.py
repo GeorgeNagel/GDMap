@@ -23,10 +23,13 @@ connect(MONGO_DATABASE_NAME)
 
 def songs_from_details(details_dict):
     """Returns a list of Song documents from a details dict."""
+
+    # Get show-wide values
+    show_id = details_dict['dir'].split('/items/')[-1]
+    show_date = details_dict['metadata']['date'][0]
+    show_location = details_dict['metadata']['coverage'][0]
+
     songs = []
-    show_path = details_dict['dir']
-    # Get the show id from the path
-    show_id = show_path.split('/items/')[-1]
     for file_ in details_dict['files']:
         try:
             file_dict = details_dict['files'][file_]
@@ -45,7 +48,9 @@ def songs_from_details(details_dict):
                         'album': file_dict['album'],
                         'sha1': file_dict['sha1'],
                         'title': file_dict['title'],
-                        'track': int(file_dict['track'])
+                        'track': int(file_dict['track']),
+                        'date': show_date,
+                        'location': show_location
                     }
                     song = Song(**song_data)
                     logging.debug("Song data: %s" % song_data)
