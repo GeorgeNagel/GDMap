@@ -4,7 +4,7 @@ import unittest
 
 from mock import Mock, patch
 
-from download_songs import download_songs
+from archive_api.download_songs import download_songs
 from models import Song
 from tests.utils import mongo_clean
 
@@ -30,9 +30,9 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('download_songs.requests.get') as get_mock:
+        with patch('archive_api.download_songs.requests.get') as get_mock:
             # Patch show_identifiers() to return an id without making calls
-            with patch('download_songs.show_identifiers') as ids_mock:
+            with patch('archive_api.download_songs.show_identifiers') as ids_mock:
                 ids_mock.return_value = ['abc123']
                 get_mock.return_value = mock_response
 

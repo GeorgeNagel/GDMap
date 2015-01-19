@@ -4,7 +4,7 @@ import unittest
 
 from mock import Mock, patch
 
-from download_shows import internetarchive_search
+from archive_api.download_shows import internetarchive_search
 
 fixtures_dir = 'tests/fixtures'
 
