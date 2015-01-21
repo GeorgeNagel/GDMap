@@ -55,4 +55,4 @@ def server():
     """Run the unit tests."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/app.py')
+            run('virtualenv/bin/python gdmap/run_server.py')
