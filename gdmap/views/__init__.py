@@ -1,2 +1,2 @@
-from api import *  # noqa
+from search_api import *  # noqa
 from base import *  # noqa
