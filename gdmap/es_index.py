@@ -42,5 +42,11 @@ def index_songs():
     for song in Song.objects:
         index_song(song)
 
+
+def query_es(query_body):
+    """Query the elasticsearch index."""
+    res = es.search(index=ELASTICSEARCH_INDEX_NAME, body=query_body)
+    return res
+
 if __name__ == "__main__":
     index_songs()
