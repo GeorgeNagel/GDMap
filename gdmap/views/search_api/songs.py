@@ -21,6 +21,12 @@ parser.add_argument('location', type=str)
 # Filter by track number
 parser.add_argument('track', type=int)
 
+# Results per page
+parser.add_argument('per_page', type=int)
+
+# Page number
+parser.add_argument('page', type=int)
+
 
 class SongResource(Resource):
     # Define the access point for this resource
@@ -30,8 +36,6 @@ class SongResource(Resource):
     def get(self):
         args = parser.parse_args()
         query_body = _build_query_body(args)
-        import logging
-        logging.warning("QUERY: %s" % query_body)
         query_result = query_es(query_body)
         return query_result
 
@@ -39,8 +43,15 @@ class SongResource(Resource):
 def _build_query_body(args):
     multi_field_query = None
     field_queries = []
+    # Get page information with defaults
+    page = args.get('page') or 1
+    per_page = args.get('per_page') or 10
+    from_ = (page - 1) * per_page
+    query_body = {'from': from_, 'size': per_page}
+    # Get multi-field query body
     if args.get('q'):
         multi_field_query = _build_multi_field_query(args.get('q'))
+    # Get targeted query bodies
     fields = ['sha1', 'show_id', 'filename', 'album', 'title', 'location', 'track']
     for field in fields:
         if args.get(field):
@@ -49,27 +60,21 @@ def _build_query_body(args):
             field_queries.append(field_query)
     if multi_field_query and field_queries:
         must_queries = field_queries + [multi_field_query]
-        query_body = {
-            "query": {
-                "bool": {
-                    "must": must_queries
-                }
+        query_body['query'] = {
+            "bool": {
+                "must": must_queries
             }
         }
     elif multi_field_query:
-        query_body = {
-            "query": multi_field_query
-        }
+        query_body['query'] = multi_field_query
     elif field_queries:
-        query_body = {
-            "query": {
-                "bool": {
-                    "must": field_queries
-                }
+        query_body['query'] = {
+            "bool": {
+                "must": field_queries
             }
         }
     else:
-        query_body = {"query": {"match_all": {}}}
+        query_body['query'] = {"match_all": {}}
     return query_body
 
 

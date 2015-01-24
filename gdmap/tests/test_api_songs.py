@@ -5,12 +5,29 @@ from gdmap.views.search_api.songs import _build_multi_field_query, \
 
 
 class BuildQueryBodyTestCase(TestCase):
+    def test_page_info_only(self):
+        """No parameters (other than page info) should give a match_all query."""
+        args = {'page': 2, 'per_page': 5}
+        query_body = _build_query_body(args)
+        self.assertEqual(
+            query_body,
+            {
+                'from': 5,
+                'size': 5,
+                'query': {
+                    'match_all': {}
+                }
+            }
+        )
+
     def test_multi_field_query(self):
         args = {'q': 'miss'}
         query_body = _build_query_body(args)
         self.assertEqual(
             query_body,
             {
+                'from': 0,
+                'size': 10,
                 'query': {
                     'multi_match': {
                         'fields': [
@@ -29,6 +46,8 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'from': 0,
+                'size': 10,
                 'query': {
                     'bool': {
                         'must': [{
@@ -47,6 +66,8 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'from': 0,
+                'size': 10,
                 'query': {
                     'bool': {
                         'must': [
@@ -73,6 +94,8 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'from': 0,
+                'size': 10,
                 'query': {
                     'bool': {
                         'must': [
