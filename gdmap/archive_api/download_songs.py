@@ -27,7 +27,11 @@ def songs_from_details(details_dict):
     # Get show-wide values
     show_id = details_dict['dir'].split('/items/')[-1]
     show_date = details_dict['metadata']['date'][0]
-    show_location = details_dict['metadata']['coverage'][0]
+
+    # Sometimes show location is not available on an item level
+    show_location = None
+    if 'coverage' in details_dict['metadata']:
+        show_location = details_dict['metadata']['coverage'][0]
 
     songs = []
     for file_ in details_dict['files']:
@@ -42,10 +46,15 @@ def songs_from_details(details_dict):
                 if file_dict['source'] == 'original':
                     # We only care about one set of files, so just
                     # index the original files
+                    album = file_dict['album']
+                    if not show_location:
+                        # There was no item-wide location info
+                        # album is in the format of "1984-05-06 - Silva Hall at the Hult Center"
+                        show_location = album.split('-')[-1].strip()
                     song_data = {
                         'show_id': show_id,
                         'filename': file_.strip('/'),
-                        'album': file_dict['album'],
+                        'album': album,
                         'sha1': file_dict['sha1'],
                         'title': file_dict['title'],
                         'track': int(file_dict['track']),

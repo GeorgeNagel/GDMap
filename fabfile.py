@@ -21,14 +21,16 @@ def reset_virtualenv():
 @hosts([host])
 def download_shows():
     with cd('gdmap'):
-        run('virtualenv/bin/python gdmap/download_shows.py')
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/archive_api/download_shows.py')
 
 
 @task
 @hosts([host])
 def download_songs():
     with cd('gdmap'):
-        run('virtualenv/bin/python gdmap/download_songs.py')
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/archive_api/download_songs.py')
 
 
 @task
