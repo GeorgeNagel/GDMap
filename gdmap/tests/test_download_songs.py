@@ -101,3 +101,26 @@ class TestDownloadShows(unittest.TestCase):
                         "track": 1
                     }
                 )
+
+    @mongo_clean
+    def test_invalid_date(self):
+        self.maxDiff = None
+        """Test creating songs from a details response with no coverage field."""
+        # Mock the response
+        mock_response = Mock()
+        json_fixture_path = os.path.join(TEST_FIXTURES_DIR, 'gd_details_response_invalid_date.json')
+        mock_attrs = {
+            'json.return_value': self._mock_json(json_fixture_path),
+            'status_code': 200
+        }
+        mock_response.configure_mock(**mock_attrs)
+        # Patch the request to return the mocked response
+        with patch('gdmap.archive_api.utils.requests.get') as get_mock:
+            # Patch show_identifiers() to return an id without making calls
+            with patch('gdmap.archive_api.download_songs.show_identifiers') as ids_mock:
+                ids_mock.return_value = ['abc123']
+                get_mock.return_value = mock_response
+
+                download_songs()
+
+                self.assertEqual(Song.objects.count(), 0)

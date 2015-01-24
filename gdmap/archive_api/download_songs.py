@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import os
 import time
@@ -26,7 +27,12 @@ def songs_from_details(details_dict):
 
     # Get show-wide values
     show_id = details_dict['dir'].split('/items/')[-1]
-    show_date = details_dict['metadata']['date'][0]
+    show_date_text = details_dict['metadata']['date'][0]
+    try:
+        show_date = datetime.strptime(show_date_text, '%Y-%m-%d')
+    except ValueError as e:
+        logging.warning("Invalid date: %s" % e)
+        return []
 
     # Sometimes show location is not available on an item level
     show_location = None
