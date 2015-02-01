@@ -25,7 +25,4 @@ class { 'elasticsearch':
   java_install => true,
 }
 
-exec {
-  "start elasticsearch":
-  command => "/usr/share/elasticsearch/bin/elasticsearch -d"
-}
+elasticsearch::instance { 'es-01': }

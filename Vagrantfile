@@ -18,6 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder ".", "/home/vagrant/gdmap", owner: "vagrant", group: "vagrant"
 
   # Provision with Puppet
+  config.vm.provision "shell", path: "puppet/pre_provision.sh"
   config.vm.provision "puppet" do |puppet|
     puppet.manifests_path = "puppet"
     puppet.manifest_file  = "manifest.pp"
