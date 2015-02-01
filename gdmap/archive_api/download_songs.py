@@ -29,7 +29,7 @@ def songs_from_details(details_dict):
     show_id = details_dict['dir'].split('/items/')[-1]
     show_date_text = details_dict['metadata']['date'][0]
     try:
-        show_date = datetime.strptime(show_date_text, '%Y-%m-%d')
+        show_date = datetime.strptime(show_date_text, '%Y-%m-%d').date()
         show_date_text = show_date.isoformat()
     except ValueError as e:
         log.warning("Invalid date: %s" % e)
