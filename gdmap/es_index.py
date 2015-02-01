@@ -2,6 +2,7 @@ import json
 import logging
 
 from elasticsearch import Elasticsearch, ConnectionTimeout
+from elasticsearch.exceptions import NotFoundError
 
 from gdmap.models import Song
 from gdmap.settings import ELASTICSEARCH_INDEX_NAME
@@ -38,7 +39,10 @@ def index_song(song_document):
 def index_songs():
     """Index all of the songs into elasticsearch from data in mongo."""
     # Delete the entire index
-    es.indices.flush(index=ELASTICSEARCH_INDEX_NAME)
+    try:
+        es.indices.flush(index=ELASTICSEARCH_INDEX_NAME)
+    except NotFoundError:
+        print "Index not found. Perhaps it does not yet exist. Skipping flush."
     for song in Song.objects:
         index_song(song)
 
