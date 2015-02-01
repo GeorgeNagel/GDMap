@@ -20,6 +20,7 @@ class TestDownloadShows(unittest.TestCase):
 
     @mongo_clean
     def test_download_songs(self):
+        self.maxDiff = None
         # Mock the response
         mock_response = Mock()
         json_fixture_path = os.path.join(TEST_FIXTURES_DIR, 'gd_details_response.json')
@@ -51,7 +52,7 @@ class TestDownloadShows(unittest.TestCase):
                         "show_id": "gd90-07-18.neumann-fob.gardner.7358.sbeok.shnf",
                         "filename": "gd90-07-18d1t01.shn",
                         # Embedded document representation of datetime
-                        'date': {'$date': 648259200000L},
+                        'date': '1990-07-18T00:00:00',
                         'location': 'Noblesville, IN',
                         "album": "1990-07-18 - Deer Creek Music Center",
                         "title": "Help On The Way",
@@ -94,7 +95,7 @@ class TestDownloadShows(unittest.TestCase):
                         "show_id": "gd1984-05-06.senn421-set2.unknown.29302.sbefail.flac16",
                         "filename": "gd1984-05-06set2d1t01.flac",
                         # Embedded document representation of datetime
-                        'date': {'$date': 452649600000L},
+                        'date': '1984-05-06T00:00:00',
                         'location': 'Silva Hall at the Hult Center',
                         "album": "1984-05-06 - Silva Hall at the Hult Center",
                         "title": "// Uncle John's Band >",

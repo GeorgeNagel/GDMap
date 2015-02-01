@@ -1,5 +1,4 @@
 from datetime import datetime
-import logging
 import os
 import sys
 import time
@@ -10,10 +9,10 @@ from mongoengine import connect
 from gdmap.archive_api.utils import cache, internetarchive_json_api, APIException
 from gdmap.archive_api.download_shows import show_identifiers
 from gdmap.models import Song
-from gdmap.settings import MONGO_DATABASE_NAME
+from gdmap.settings import MONGO_DATABASE_NAME, logging
 
 
-logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 
 base_url = 'https://archive.org/details'
@@ -31,8 +30,9 @@ def songs_from_details(details_dict):
     show_date_text = details_dict['metadata']['date'][0]
     try:
         show_date = datetime.strptime(show_date_text, '%Y-%m-%d')
+        show_date_text = show_date.isoformat()
     except ValueError as e:
-        logging.warning("Invalid date: %s" % e)
+        log.warning("Invalid date: %s" % e)
         return []
 
     # Sometimes show location is not available on an item level
@@ -44,7 +44,7 @@ def songs_from_details(details_dict):
     for file_ in details_dict['files']:
         try:
             file_dict = details_dict['files'][file_]
-            logging.debug("FILE DICT (%s, %s): %s" % (
+            log.debug("FILE DICT (%s, %s): %s" % (
                 show_id, file_, file_dict)
             )
             _, extension = os.path.splitext(file_)
@@ -65,14 +65,14 @@ def songs_from_details(details_dict):
                         'sha1': file_dict['sha1'],
                         'title': file_dict['title'],
                         'track': int(file_dict['track']),
-                        'date': show_date,
+                        'date': show_date_text,
                         'location': show_location
                     }
                     song = Song(**song_data)
-                    logging.debug("Song data: %s" % song_data)
+                    log.debug("Song data: %s" % song_data)
                     songs.append(song)
         except KeyError as e:
-            logging.warning("Bad data in %s%s: %s" % (show_id, file_, e))
+            log.warning("Bad data in %s%s: %s" % (show_id, file_, e))
     return songs
 
 
@@ -89,7 +89,7 @@ def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
             for song in songs:
                 song.save()
         except APIException as e:
-            logging.error(e)
+            log.error(e)
             errors += 1
             if errors > max_errors:
                 raise Exception("Max Requests errors exceeded: %d" % errors)
