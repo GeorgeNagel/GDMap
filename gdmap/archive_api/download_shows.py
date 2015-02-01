@@ -35,6 +35,9 @@ def internetarchive_search(collection='GratefulDead',
             response_dict = internetarchive_json_api(url)
             # Add the returned documents to the ongoing list
             requested_docs = response_dict['response']['docs']
+            if not requested_docs:
+                # You have gone past the last page of data
+                break
             docs.extend(requested_docs)
         except APIException as e:
             logging.error(e)
