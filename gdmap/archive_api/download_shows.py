@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import time
 
 from gdmap.archive_api.utils import cache, internetarchive_json_api, APIException
@@ -15,12 +16,12 @@ start = 0
 OUTPUT_FILENAME = "shows.txt"
 
 
-def internetarchive_search(collection='GratefulDead',
-                           per_page=100,
-                           start=0,
-                           crawl_delay_seconds=1,
-                           max_errors=10,
-                           stop=None):
+def download_shows(collection='GratefulDead',
+                   per_page=100,
+                   start=0,
+                   crawl_delay_seconds=1,
+                   max_errors=10,
+                   stop=None):
     docs = []
     errors = 0
     while True:
@@ -71,12 +72,13 @@ def show_identifiers(from_file=False, **kwargs):
             raise Exception("%s does not exist." % OUTPUT_FILENAME)
     else:
         # Make the live requests
-        docs = internetarchive_search(**kwargs)
+        docs = download_shows(**kwargs)
         ids = [doc['identifier'] for doc in docs]
         return ids
 
 if __name__ == '__main__':
-    ids = show_identifiers()
+    crawl_delay_seconds = int(sys.argv[1])
+    ids = show_identifiers(crawl_delay_seconds=crawl_delay_seconds)
     with open(OUTPUT_FILENAME, 'w') as fout:
         for id_ in ids:
             fout.write("%s\n" % id_)

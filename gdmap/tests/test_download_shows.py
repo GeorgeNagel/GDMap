@@ -4,7 +4,7 @@ import unittest
 
 from mock import Mock, patch
 
-from gdmap.archive_api.download_shows import internetarchive_search
+from gdmap.archive_api.download_shows import download_shows
 from gdmap.settings import TEST_FIXTURES_DIR
 
 
@@ -29,7 +29,7 @@ class TestDownloadShows(unittest.TestCase):
         with patch('gdmap.archive_api.utils.requests.get') as get_mock:
             get_mock.return_value = mock_response
 
-            docs = internetarchive_search(stop=1)
+            docs = download_shows(stop=1)
             self.assertEqual(len(docs), 10)
             self.assertEqual(
                 docs[0]['collection'],

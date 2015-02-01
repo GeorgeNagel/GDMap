@@ -19,18 +19,18 @@ def reset_virtualenv():
 
 @task
 @hosts([host])
-def download_shows():
+def download_shows(crawl_delay=1):
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/archive_api/download_shows.py')
+            run('virtualenv/bin/python gdmap/archive_api/download_shows.py %s' % crawl_delay)
 
 
 @task
 @hosts([host])
-def download_songs():
+def download_songs(crawl_delay=1):
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/archive_api/download_songs.py')
+            run('virtualenv/bin/python gdmap/archive_api/download_songs.py %s' % crawl_delay)
 
 
 @task

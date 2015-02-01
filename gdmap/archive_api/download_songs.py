@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 import os
+import sys
 import time
 
 
@@ -98,4 +99,5 @@ def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
             time.sleep(crawl_delay_seconds)
 
 if __name__ == '__main__':
-    download_songs()
+    crawl_delay_seconds = int(sys.argv[1])
+    download_songs(crawl_delay_seconds=crawl_delay_seconds)
