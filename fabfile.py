@@ -43,12 +43,15 @@ def index_songs():
 
 @task
 @hosts([host])
-def test():
+def test(*args):
     """Run the unit tests."""
     with cd('gdmap'):
         with shell_env(TESTING='1'):
             run('virtualenv/bin/flake8 gdmap')
-            run('virtualenv/bin/nosetests gdmap -s')
+            # If you don't supply a specific test to run, run on the project
+            if not args:
+                args = 'gdmap'
+            run('virtualenv/bin/nosetests %s -s' % args)
 
 
 @task

@@ -37,7 +37,8 @@ class SongResource(Resource):
         args = parser.parse_args()
         query_body = _build_query_body(args)
         query_result = query_es(query_body)
-        return query_result
+        formatted_result = _format_result(query_result)
+        return formatted_result
 
 
 def _build_query_body(args):
@@ -96,6 +97,17 @@ def _build_match_query(field, phrase):
             field: phrase
         }
     }
+
+
+def _format_result(es_result):
+    total = es_result['hits']['total']
+    songs = es_result['hits']['hits']
+    # Clean the elasticsearch ids from the songs
+    clean_songs = []
+    for song in songs:
+        song.pop('_id')
+        clean_songs.append(song)
+    return {'total': total, 'songs': clean_songs}
 
 # Add the endpoint to the search API
 api.add_resource(SongResource, SongResource.uri)

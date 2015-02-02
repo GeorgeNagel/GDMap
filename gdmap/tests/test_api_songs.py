@@ -1,7 +1,61 @@
+import json
+import time
 from unittest import TestCase
 
+from gdmap.es_index import index_songs
+from gdmap.models import Song
+from gdmap.settings import logging
+from gdmap.tests.utils import mongo_clean, APITestCase
 from gdmap.views.search_api.songs import _build_multi_field_query, \
     _build_match_query, _build_query_body
+
+log = logging.getLogger(__name__)
+
+test_song = Song(sha1='abc123',
+                 show_id='test_show_id',
+                 filename='test_filename',
+                 album='test_album',
+                 title='test_title',
+                 track=1,
+                 date='1980-01-02',
+                 location='New York, NY')
+
+
+class SongsAPITestCase(APITestCase):
+    @mongo_clean
+    def test_query_all(self):
+        self.maxDiff = None
+        log.debug("Saving song in Mongo.")
+        test_song.save()
+        self.assertEqual(Song.objects.count(), 1)
+        log.debug("Indexing test song.")
+        index_songs()
+        # Wait for the song to be indexed
+        time.sleep(1)
+        log.debug("Getting all indexed songs.")
+        response = self.app.get('/api/songs/')
+        self.assertEqual(
+            json.loads(response.data),
+            {
+                "songs": [
+                    {
+                        "_index": "gdmap_test",
+                        "_score": 1.0,
+                        "_source": {
+                            "album": "test_album",
+                            "date": "1980-01-02",
+                            "filename": "test_filename",
+                            "location": "New York, NY",
+                            "show_id": "test_show_id",
+                            "title": "test_title",
+                            "track": 1
+                        },
+                        "_type": "song"
+                    }
+                ],
+                "total": 1
+            }
+        )
 
 
 class BuildQueryBodyTestCase(TestCase):
