@@ -27,6 +27,12 @@ parser.add_argument('per_page', type=int)
 # Page number
 parser.add_argument('page', type=int)
 
+# Date min
+parser.add_argument('date_gte', type=str)
+
+# Date max
+parser.add_argument('date_lte', type=str)
+
 
 class SongResource(Resource):
     # Define the access point for this resource
@@ -59,23 +65,37 @@ def _build_query_body(args):
             phrase = args.get(field)
             field_query = _build_match_query(field, phrase)
             field_queries.append(field_query)
+    # Get date filters
+    date_gte = args.get('date_gte', None)
+    date_lte = args.get('date_lte', None)
+    filter_body = _build_date_filter(date_gte, date_lte)
+    terms_query = None
     if multi_field_query and field_queries:
         must_queries = field_queries + [multi_field_query]
-        query_body['query'] = {
+        terms_query = {
             "bool": {
                 "must": must_queries
             }
         }
     elif multi_field_query:
-        query_body['query'] = multi_field_query
+        terms_query = multi_field_query
     elif field_queries:
-        query_body['query'] = {
+        terms_query = {
             "bool": {
                 "must": field_queries
             }
         }
     else:
-        query_body['query'] = {"match_all": {}}
+        terms_query = {"match_all": {}}
+    if filter_body:
+        query_body["query"] = {
+            "filtered": {
+                "query": terms_query,
+                "filter": filter_body
+            }
+        }
+    else:
+        query_body["query"] = terms_query
     return query_body
 
 
@@ -99,14 +119,25 @@ def _build_match_query(field, phrase):
     }
 
 
+def _build_date_filter(date_gte, date_lte):
+    if not date_gte and not date_lte:
+        return None
+    filter_body = {"range": {"date": {}}}
+    if date_gte:
+        filter_body["range"]["date"]["gte"] = date_gte
+    if date_lte:
+        filter_body["range"]["date"]["lte"] = date_lte
+    return filter_body
+
+
 def _format_result(es_result):
     total = es_result['hits']['total']
     songs = es_result['hits']['hits']
     # Clean the elasticsearch ids from the songs
     clean_songs = []
     for song in songs:
-        song.pop('_id')
-        clean_songs.append(song)
+        data = song['_source']
+        clean_songs.append(data)
     return {'total': total, 'songs': clean_songs}
 
 # Add the endpoint to the search API

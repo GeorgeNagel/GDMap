@@ -7,7 +7,7 @@ from gdmap.models import Song
 from gdmap.settings import logging
 from gdmap.tests.utils import mongo_clean, APITestCase
 from gdmap.views.search_api.songs import _build_multi_field_query, \
-    _build_match_query, _build_query_body
+    _build_match_query, _build_query_body, _build_date_filter
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class SongsAPITestCase(APITestCase):
         log.debug("Indexing test song.")
         index_songs()
         # Wait for the song to be indexed
-        time.sleep(1)
+        time.sleep(2)
         log.debug("Getting all indexed songs.")
         response = self.app.get('/api/songs/')
         self.assertEqual(
@@ -39,18 +39,13 @@ class SongsAPITestCase(APITestCase):
             {
                 "songs": [
                     {
-                        "_index": "gdmap_test",
-                        "_score": 1.0,
-                        "_source": {
-                            "album": "test_album",
-                            "date": "1980-01-02",
-                            "filename": "test_filename",
-                            "location": "New York, NY",
-                            "show_id": "test_show_id",
-                            "title": "test_title",
-                            "track": 1
-                        },
-                        "_type": "song"
+                        "album": "test_album",
+                        "date": "1980-01-02",
+                        "filename": "test_filename",
+                        "location": "New York, NY",
+                        "show_id": "test_show_id",
+                        "title": "test_title",
+                        "track": 1
                     }
                 ],
                 "total": 1
@@ -205,4 +200,20 @@ class BuildMatchQueryTestCase(TestCase):
         self.assertEqual(
             query_body,
             {'match': {'track': 2}}
+        )
+
+
+class BuildDateFilterTestCase(TestCase):
+    def test_build_date_filter(self):
+        filter_body = _build_date_filter("1990-01-02", "1990-01-03")
+        self.assertEqual(
+            filter_body,
+            {
+                "range": {
+                    "date": {
+                        "gte": "1990-01-02",
+                        "lte": "1990-01-03"
+                    }
+                }
+            }
         )

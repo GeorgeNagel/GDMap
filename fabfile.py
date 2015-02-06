@@ -57,7 +57,7 @@ def test(*args):
 @task
 @hosts([host])
 def server():
-    """Run the unit tests."""
+    """Run the server."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
             run('virtualenv/bin/python gdmap/run_server.py')
