@@ -136,6 +136,27 @@ class BuildQueryBodyTestCase(TestCase):
             }
         )
 
+    def test_date_filters_query(self):
+        args = {'date_gte': "1990", 'date_lte': '1995-01-02'}
+        query_body = _build_query_body(args)
+        self.assertEqual(
+            query_body,
+            {
+                'from': 0,
+                'query': {
+                    'filtered': {
+                        'filter': {
+                            'range': {
+                                'date': {'gte': '1990', 'lte': '1995-01-02'}
+                            }
+                        },
+                        'query': {'match_all': {}}
+                    }
+                },
+                'size': 10
+            }
+        )
+
     def combined_query(self):
         """Test the case of a multifield query and targeted query."""
         args = {'q': 'diplo', 'track': 4, 'title': 'miss'}
