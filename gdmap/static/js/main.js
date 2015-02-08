@@ -1,8 +1,11 @@
 require.config({
   paths: {
-    jquery: 'libs/jquery/jquery',
-    underscore: 'libs/underscore/underscore',
-    backbone: 'libs/backbone/backbone',
+    jquery: "libs/jquery/jquery",
+    underscore: "libs/underscore/underscore",
+    backbone: "libs/backbone/backbone",
+    mustache: "libs/mustache/mustache",
+    text: "libs/text/text",
+    templates: "../templates"
   },
   shim: {
     backbone: {

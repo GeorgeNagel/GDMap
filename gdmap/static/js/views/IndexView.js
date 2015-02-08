@@ -5,7 +5,7 @@ define([
   return Backbone.View.extend({
     el: $("#container"),
     render: function(){
-        this.$el.html("<h1>Booger</h1>")
+        this.$el.html("<h1>Index</h1>")
     }
   });
 });

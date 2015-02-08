@@ -1,30 +1,37 @@
 // Filename: router.js
 define([
-  'jquery',
-  'underscore',
-  'backbone',
-  'views/IndexView'
-], function($, _, Backbone, IndexView){
+  "jquery",
+  "underscore",
+  "backbone",
+  "views/IndexView",
+  "views/SongsView"
+], function($, _, Backbone, IndexView, SongsView){
   var AppRouter = Backbone.Router.extend({
     routes: {
-      // Define some URL routes
-      '': 'index',
+      "": "index",
+      "songs/": "songsList",
 
       // Default
-      '*actions': 'defaultAction'
+      "*actions": "defaultAction"
     },
     index: function() {
       var indexView = new IndexView();
       indexView.render(); 
     },
+    songsList: function() {
+      var songsView = new SongsView();
+      songsView.render();
+    },
     defaultAction: function(actions) {
-        console.log('No route:', actions);
+        console.log("No route:", actions);
     }
   });
 
   var initialize = function(){
     var app_router = new AppRouter();
-    Backbone.history.start();
+    // Navigate using urls rather than hashes
+    // e.g. /songs/ rather than /#songs
+    Backbone.history.start({pushState: true});
   };
   return {
     initialize: initialize
