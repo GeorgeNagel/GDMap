@@ -4,12 +4,15 @@ define([
   "underscore",
   "backbone",
   "views/IndexView",
-  "views/SongsView"
-], function($, _, Backbone, IndexView, SongsView){
+  "views/SongsView",
+  "views/SearchView"
+], function($, _, Backbone, IndexView, SongsView, SearchView){
   var AppRouter = Backbone.Router.extend({
     routes: {
       "": "index",
       "songs/": "songsList",
+      "search/": "searchSongs",
+      "search/:query": "searchSongs",
 
       // Default
       "*actions": "defaultAction"
@@ -21,6 +24,10 @@ define([
     songsList: function() {
       var songsView = new SongsView();
       songsView.render();
+    },
+    searchSongs: function(query) {
+      var searchView = new SearchView({"query": query});
+      searchView.render();
     },
     defaultAction: function(actions) {
         console.log("No route:", actions);

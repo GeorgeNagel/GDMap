@@ -14,3 +14,9 @@ def index():
 def songs():
     content = get_query_results()
     return render_template('base.html', content=content)
+
+
+@app.route('/search/<query>')
+def search(query):
+    content = get_query_results()
+    return render_template('base.html', content=content)

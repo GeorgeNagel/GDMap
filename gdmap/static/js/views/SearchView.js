@@ -8,8 +8,7 @@ define([
     el: $("#container"),
     initialize: function(options) {
       var self = this;
-      self.options = options;
-      var songs = new SongsCollection(options);
+      var songs = new SongsCollection([], options);
       songs.fetch({
         success: function() {
           self.render()
