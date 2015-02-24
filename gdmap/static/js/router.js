@@ -12,7 +12,7 @@ define([
       "": "index",
       "songs/": "songsList",
       "search/": "searchSongs",
-      "search/:query": "searchSongs",
+      "search/?:query": "searchSongs",
 
       // Default
       "*actions": "defaultAction"
