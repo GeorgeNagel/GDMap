@@ -18,7 +18,7 @@ define([
     },
     render: function(){
       var self = this;
-      self.$el.html("<h1>Songs</h1>")
+      self.$el.html("<h1>Search</h1>")
       self.songs.each(function(song) {
         var view = new SongView({model: song});
         self.$el.append(view.render());
