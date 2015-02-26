@@ -1,3 +1,4 @@
+from flask import abort
 from flask.ext.restful import Resource, reqparse
 
 from gdmap import api
@@ -33,6 +34,10 @@ parser.add_argument('date_gte', type=str)
 # Date max
 parser.add_argument('date_lte', type=str)
 
+# Sort order
+parser.add_argument('sort', type=str)
+parser.add_argument('sort_order', type=str)
+
 
 class SongResource(Resource):
     # Define the access point for this resource
@@ -55,6 +60,18 @@ def _build_query_body(args):
     per_page = args.get('per_page') or 10
     from_ = (page - 1) * per_page
     query_body = {'from': from_, 'size': per_page}
+
+    # Sort results
+    sort_field = args.get('sort', None)
+    sort_order = args.get('sort_order') or 'asc'
+    if sort_field not in [None, 'title']:
+        abort(400)
+    if sort_order not in ['asc', 'desc']:
+        print "SORT ORDER: %s" % sort_order
+        abort(400)
+    if sort_field:
+        query_body['sort'] = [{sort_field: {"order": sort_order}}]
+
     # Get multi-field query body
     if args.get('q'):
         multi_field_query = _build_multi_field_query(args.get('q'))
@@ -68,6 +85,7 @@ def _build_query_body(args):
     # Get date filters
     date_gte = args.get('date_gte', None)
     date_lte = args.get('date_lte', None)
+
     filter_body = _build_date_filter(date_gte, date_lte)
     terms_query = None
     if multi_field_query and field_queries:
@@ -96,7 +114,27 @@ def _build_query_body(args):
         }
     else:
         query_body["query"] = terms_query
+    query_body['aggregations'] = _show_aggregations_body(per_page)
     return query_body
+
+
+def _show_aggregations_body(num_results, hits_per_show=1):
+    aggregations_body = {
+        "shows": {
+            "terms": {
+                "field": "album",
+                "size": num_results
+            },
+            "aggregations": {
+                "shows_hits": {
+                    "top_hits": {
+                        "size": hits_per_show
+                    }
+                }
+            }
+        }
+    }
+    return aggregations_body
 
 
 def _build_multi_field_query(phrase):
@@ -131,6 +169,13 @@ def _build_date_filter(date_gte, date_lte):
 
 
 def _format_result(es_result):
+    songs_result = _format_songs(es_result)
+    songs_by_show_result = _format_songs_by_show(es_result)
+    return {'songs': songs_result, 'songs_by_show': songs_by_show_result}
+
+
+def _format_songs(es_result):
+    """Return the formatted songs."""
     total = es_result['hits']['total']
     songs = es_result['hits']['hits']
     # Clean the elasticsearch ids from the songs
@@ -139,6 +184,23 @@ def _format_result(es_result):
         data = song['_source']
         clean_songs.append(data)
     return {'total': total, 'songs': clean_songs}
+
+
+def _format_songs_by_show(es_result):
+    """Return the formatted songs grouped by show."""
+    songs_by_shows = []
+    show_buckets = es_result['aggregations']['shows']['buckets']
+    for show_bucket in show_buckets:
+        show_name = show_bucket['key']
+        songs = show_bucket['shows_hits']['hits']['hits']
+        total = show_bucket['shows_hits']['hits']['total']
+        # Clean the elasticsearch ids from the songs
+        clean_songs = []
+        for song in songs:
+            clean_songs.append(song['_source'])
+        songs_by_shows.append({'show': show_name, 'total': total, 'songs': clean_songs})
+    return songs_by_shows
+
 
 # Add the endpoint to the search API
 api.add_resource(SongResource, SongResource.uri)
