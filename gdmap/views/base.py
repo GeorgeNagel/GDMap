@@ -17,3 +17,8 @@ def songs():
 @app.route('/search/<query>')
 def search(query):
     return render_template('base.html')
+
+
+@app.route('/show/<show_id>')
+def show(show_id):
+    return render_template('base.html')
