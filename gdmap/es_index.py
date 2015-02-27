@@ -10,6 +10,39 @@ log = logging.getLogger(__name__)
 es = Elasticsearch()
 doc_type = 'song'
 
+SONG_MAPPINGS = {
+    "mappings": {
+        "song": {
+            "properties": {
+                "sha1": {"type": "string", "index": "not_analyzed"},
+                "show_id": {"type": "string", "index": "not_analyzed"},
+                "filename": {"type": "string", "index": "not_analyzed"},
+                "album": {
+                    "type": "multi_field",
+                    "fields": {
+                        "album": {
+                            "type": "string",
+                            "index": "analyzed"
+                        },
+                        "raw": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+                    }
+                },
+                "title": {"type": "string", "index": "analyzed"},
+                "track": {"type": "integer"},
+                # Let Elasticsearch take care of the date mapping for us
+                "location": {"type": "string", "index": "analyzed"}
+            }
+        }
+    }
+}
+
+
+def create_index():
+    es.indices.create(ELASTICSEARCH_INDEX_NAME, SONG_MAPPINGS)
+
 
 def index_song(song_document):
     song_data = json.loads(song_document.to_json())
@@ -43,6 +76,7 @@ def index_songs():
         log.info("Removing index: %s" % ELASTICSEARCH_INDEX_NAME)
         # We use delete rather than flush in case the mapping has changed.
         es.indices.delete(ELASTICSEARCH_INDEX_NAME)
+    create_index()
     for song in Song.objects:
         index_song(song)
 

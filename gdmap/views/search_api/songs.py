@@ -122,7 +122,7 @@ def _show_aggregations_body(num_results, hits_per_show=1):
     aggregations_body = {
         "shows": {
             "terms": {
-                "field": "album",
+                "field": "album.raw",
                 "size": num_results
             },
             "aggregations": {

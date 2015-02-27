@@ -18,7 +18,7 @@ class SongsAPITestCase(APITestCase):
         self.test_song_1 = Song(sha1='abc123',
                                 show_id='test_show_id',
                                 filename='test_filename',
-                                album='test_album',
+                                album='test album',
                                 title='test_title',
                                 track=1,
                                 date='1980-01-02',
@@ -28,7 +28,7 @@ class SongsAPITestCase(APITestCase):
         self.test_song_2 = Song(sha1='abc1232',
                                 show_id='test_show_id_2',
                                 filename='test_filename_2',
-                                album='test_album_2',
+                                album='test album_2',
                                 title='test_title_2',
                                 track=2,
                                 date='1990-01-01',
@@ -54,7 +54,7 @@ class SongsAPITestCase(APITestCase):
                 'songs': {
                     "songs": [
                         {
-                            "album": "test_album",
+                            "album": "test album",
                             "date": "1980-01-02",
                             "filename": "test_filename",
                             "location": "New York, NY",
@@ -67,10 +67,10 @@ class SongsAPITestCase(APITestCase):
                 },
                 'songs_by_show': [
                     {
-                        u'show': u'test_album',
+                        u'show': u'test album',
                         u'songs': [
                             {
-                                u'album': u'test_album',
+                                u'album': u'test album',
                                 u'date': u'1980-01-02',
                                 u'filename': u'test_filename',
                                 u'location': u'New York, NY',
@@ -106,7 +106,7 @@ class SongsAPITestCase(APITestCase):
                 'songs': {
                     u'songs': [
                         {
-                            u'album': u'test_album',
+                            u'album': u'test album',
                             u'date': u'1980-01-02',
                             u'filename': u'test_filename',
                             u'location': u'New York, NY',
@@ -115,7 +115,7 @@ class SongsAPITestCase(APITestCase):
                             u'track': 1
                         },
                         {
-                            u'album': u'test_album_2',
+                            u'album': u'test album_2',
                             u'date': u'1990-01-01',
                             u'filename': u'test_filename_2',
                             u'location': u'Bingo, NY',
@@ -128,10 +128,10 @@ class SongsAPITestCase(APITestCase):
                 },
                 u'songs_by_show': [
                     {
-                        u'show': u'test_album',
+                        u'show': u'test album',
                         u'songs': [
                             {
-                                u'album': u'test_album',
+                                u'album': u'test album',
                                 u'date': u'1980-01-02',
                                 u'filename': u'test_filename',
                                 u'location': u'New York, NY',
@@ -142,10 +142,10 @@ class SongsAPITestCase(APITestCase):
                         ],
                         u'total': 1},
                     {
-                        u'show': u'test_album_2',
+                        u'show': u'test album_2',
                         u'songs': [
                             {
-                                u'album': u'test_album_2',
+                                u'album': u'test album_2',
                                 u'date': u'1990-01-01',
                                 u'filename': u'test_filename_2',
                                 u'location': u'Bingo, NY',
@@ -178,7 +178,7 @@ class BuildQueryBodyTestCase(TestCase):
                         'aggregations': {
                             'shows_hits': {'top_hits': {'size': 1}}
                         },
-                        'terms': {'field': 'album', 'size': 5}
+                        'terms': {'field': 'album.raw', 'size': 5}
                     }
                 },
                 'from': 5,
@@ -201,7 +201,7 @@ class BuildQueryBodyTestCase(TestCase):
                         'aggregations': {
                             'shows_hits': {'top_hits': {'size': 1}}
                         },
-                        'terms': {'field': 'album', 'size': 5}
+                        'terms': {'field': 'album.raw', 'size': 5}
                     }
                 },
                 'from': 5,
@@ -224,7 +224,7 @@ class BuildQueryBodyTestCase(TestCase):
                         'aggregations': {
                             'shows_hits': {'top_hits': {'size': 1}}
                         },
-                        'terms': {'field': 'album', 'size': 10}
+                        'terms': {'field': 'album.raw', 'size': 10}
                     }
                 },
                 'from': 0,
@@ -252,7 +252,7 @@ class BuildQueryBodyTestCase(TestCase):
                         'aggregations': {
                             'shows_hits': {'top_hits': {'size': 1}}
                         },
-                        'terms': {'field': 'album', 'size': 10}
+                        'terms': {'field': 'album.raw', 'size': 10}
                     }
                 },
                 'from': 0,
@@ -281,7 +281,7 @@ class BuildQueryBodyTestCase(TestCase):
                         'aggregations': {
                             'shows_hits': {'top_hits': {'size': 1}}
                         },
-                        'terms': {'field': 'album', 'size': 10}
+                        'terms': {'field': 'album.raw', 'size': 10}
                     }
                 },
                 'from': 0,
@@ -316,7 +316,7 @@ class BuildQueryBodyTestCase(TestCase):
                         'aggregations': {
                             'shows_hits': {'top_hits': {'size': 1}}
                         },
-                        'terms': {'field': 'album', 'size': 10}
+                        'terms': {'field': 'album.raw', 'size': 10}
                     }
                 },
                 'from': 0,
