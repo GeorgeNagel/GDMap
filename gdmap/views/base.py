@@ -1,10 +1,19 @@
 from flask import render_template
 
 from gdmap import app
-from gdmap.query import get_query_results
 
 
 @app.route('/')
 def index():
-    content = get_query_results()
-    return render_template('base.html', content=content)
+    return render_template('base.html')
+
+
+@app.route('/songs/')
+def songs():
+    return render_template('base.html')
+
+
+@app.route('/search/', defaults={'query': None})
+@app.route('/search/<query>')
+def search(query):
+    return render_template('base.html')

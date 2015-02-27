@@ -19,6 +19,13 @@ def reset_virtualenv():
 
 @task
 @hosts([host])
+def clean():
+    """Remove .pyc files."""
+    run("find gdmap -name '*.pyc' -delete")
+
+
+@task
+@hosts([host])
 def download_shows(crawl_delay=1):
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):

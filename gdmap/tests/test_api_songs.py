@@ -11,22 +11,36 @@ from gdmap.views.search_api.songs import _build_multi_field_query, \
 
 log = logging.getLogger(__name__)
 
-test_song = Song(sha1='abc123',
-                 show_id='test_show_id',
-                 filename='test_filename',
-                 album='test_album',
-                 title='test_title',
-                 track=1,
-                 date='1980-01-02',
-                 location='New York, NY')
-
 
 class SongsAPITestCase(APITestCase):
+    def setUp(self):
+        # Two songs from the same show
+        self.test_song_1 = Song(sha1='abc123',
+                                show_id='test_show_id',
+                                filename='test_filename',
+                                album='test album',
+                                title='test_title',
+                                track=1,
+                                date='1980-01-02',
+                                location='New York, NY')
+
+        # A song from another show
+        self.test_song_2 = Song(sha1='abc1232',
+                                show_id='test_show_id_2',
+                                filename='test_filename_2',
+                                album='test album_2',
+                                title='test_title_2',
+                                track=2,
+                                date='1990-01-01',
+                                location='Bingo, NY')
+        super(SongsAPITestCase, self).setUp()
+
     @mongo_clean
     def test_query_all(self):
+        """Test the results of querying for all songs."""
         self.maxDiff = None
         log.debug("Saving song in Mongo.")
-        test_song.save()
+        self.test_song_1.save()
         self.assertEqual(Song.objects.count(), 1)
         log.debug("Indexing test song.")
         index_songs()
@@ -37,20 +51,118 @@ class SongsAPITestCase(APITestCase):
         self.assertEqual(
             json.loads(response.data),
             {
-                "songs": [
+                'songs': {
+                    "songs": [
+                        {
+                            "album": "test album",
+                            "date": "1980-01-02",
+                            "filename": "test_filename",
+                            "location": "New York, NY",
+                            "show_id": "test_show_id",
+                            "title": "test_title",
+                            "track": 1
+                        }
+                    ],
+                    "total": 1
+                },
+                'songs_by_show': [
                     {
-                        "album": "test_album",
-                        "date": "1980-01-02",
-                        "filename": "test_filename",
-                        "location": "New York, NY",
-                        "show_id": "test_show_id",
-                        "title": "test_title",
-                        "track": 1
+                        u'show': u'test album',
+                        u'songs': [
+                            {
+                                u'album': u'test album',
+                                u'date': u'1980-01-02',
+                                u'filename': u'test_filename',
+                                u'location': u'New York, NY',
+                                u'show_id': u'test_show_id',
+                                u'title': u'test_title',
+                                u'track': 1
+                            },
+                        ],
+                        u'total': 1}]}
+        )
+
+    @mongo_clean
+    def test_shows_aggregation(self):
+        """Test the show aggregation results for multiple songs."""
+        self.maxDiff = None
+        log.debug("Saving song in Mongo.")
+        # Save songs from show 1
+        self.test_song_1.save()
+        # Save songs from show 2
+        self.test_song_2.save()
+        self.assertEqual(Song.objects.count(), 2)
+
+        log.debug("Indexing test songs.")
+        index_songs()
+        # Wait for the song to be indexed
+        time.sleep(2)
+        log.debug("Getting all indexed songs.")
+        # Query for every song with 'test' in the title or elsewhere
+        response = self.app.get('/api/songs/?sort=title')
+        self.assertEqual(
+            json.loads(response.data),
+            {
+                'songs': {
+                    u'songs': [
+                        {
+                            u'album': u'test album',
+                            u'date': u'1980-01-02',
+                            u'filename': u'test_filename',
+                            u'location': u'New York, NY',
+                            u'show_id': u'test_show_id',
+                            u'title': u'test_title',
+                            u'track': 1
+                        },
+                        {
+                            u'album': u'test album_2',
+                            u'date': u'1990-01-01',
+                            u'filename': u'test_filename_2',
+                            u'location': u'Bingo, NY',
+                            u'show_id': u'test_show_id_2',
+                            u'title': u'test_title_2',
+                            u'track': 2
+                        }
+                    ],
+                    u'total': 2
+                },
+                u'songs_by_show': [
+                    {
+                        u'show': u'test album',
+                        u'songs': [
+                            {
+                                u'album': u'test album',
+                                u'date': u'1980-01-02',
+                                u'filename': u'test_filename',
+                                u'location': u'New York, NY',
+                                u'show_id': u'test_show_id',
+                                u'title': u'test_title',
+                                u'track': 1
+                            }
+                        ],
+                        u'total': 1},
+                    {
+                        u'show': u'test album_2',
+                        u'songs': [
+                            {
+                                u'album': u'test album_2',
+                                u'date': u'1990-01-01',
+                                u'filename': u'test_filename_2',
+                                u'location': u'Bingo, NY',
+                                u'show_id': u'test_show_id_2',
+                                u'title': u'test_title_2',
+                                u'track': 2
+                            }
+                        ],
+                        u'total': 1
                     }
-                ],
-                "total": 1
+                ]
             }
         )
+
+    def test_400_invalid_sort(self):
+        response = self.app.get('/api/songs/?sort=toast')
+        self.assertEqual(response.status, '400 BAD REQUEST')
 
 
 class BuildQueryBodyTestCase(TestCase):
@@ -61,11 +173,43 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'aggregations': {
+                    'shows': {
+                        'aggregations': {
+                            'shows_hits': {'top_hits': {'size': 1}}
+                        },
+                        'terms': {'field': 'album.raw', 'size': 5}
+                    }
+                },
                 'from': 5,
                 'size': 5,
                 'query': {
                     'match_all': {}
                 }
+            }
+        )
+
+    def test_sort(self):
+        """Test the query body when a sort order is specified."""
+        args = {'page': 2, 'per_page': 5, 'sort': 'title'}
+        query_body = _build_query_body(args)
+        self.assertEqual(
+            query_body,
+            {
+                'aggregations': {
+                    'shows': {
+                        'aggregations': {
+                            'shows_hits': {'top_hits': {'size': 1}}
+                        },
+                        'terms': {'field': 'album.raw', 'size': 5}
+                    }
+                },
+                'from': 5,
+                'size': 5,
+                'query': {
+                    'match_all': {}
+                },
+                "sort": [{"title": {"order": "asc"}}]
             }
         )
 
@@ -75,6 +219,14 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'aggregations': {
+                    'shows': {
+                        'aggregations': {
+                            'shows_hits': {'top_hits': {'size': 1}}
+                        },
+                        'terms': {'field': 'album.raw', 'size': 10}
+                    }
+                },
                 'from': 0,
                 'size': 10,
                 'query': {
@@ -95,6 +247,14 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'aggregations': {
+                    'shows': {
+                        'aggregations': {
+                            'shows_hits': {'top_hits': {'size': 1}}
+                        },
+                        'terms': {'field': 'album.raw', 'size': 10}
+                    }
+                },
                 'from': 0,
                 'size': 10,
                 'query': {
@@ -110,11 +270,20 @@ class BuildQueryBodyTestCase(TestCase):
         )
 
     def test_multiple_match_query(self):
+        """Test the query body for a multi-field query."""
         args = {'track': 4, 'title': 'miss'}
         query_body = _build_query_body(args)
         self.assertEqual(
             query_body,
             {
+                'aggregations': {
+                    'shows': {
+                        'aggregations': {
+                            'shows_hits': {'top_hits': {'size': 1}}
+                        },
+                        'terms': {'field': 'album.raw', 'size': 10}
+                    }
+                },
                 'from': 0,
                 'size': 10,
                 'query': {
@@ -142,6 +311,14 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'aggregations': {
+                    'shows': {
+                        'aggregations': {
+                            'shows_hits': {'top_hits': {'size': 1}}
+                        },
+                        'terms': {'field': 'album.raw', 'size': 10}
+                    }
+                },
                 'from': 0,
                 'query': {
                     'filtered': {
