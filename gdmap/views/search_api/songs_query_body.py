@@ -8,8 +8,9 @@ def build_query_body(args):
     # Get page information with defaults
     page = args.get('page') or 1
     per_page = args.get('per_page') or 10
-    from_ = (page - 1) * per_page
-    query_body = {'from': from_, 'size': per_page}
+
+    # Don't return any hits, just aggregations
+    query_body = {'size': 0}
 
     # Sort results
     sort_field = args.get('sort', None)

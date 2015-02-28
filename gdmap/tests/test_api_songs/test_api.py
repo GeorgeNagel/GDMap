@@ -48,20 +48,7 @@ class SongsAPITestCase(APITestCase):
         self.assertEqual(
             json.loads(response.data),
             {
-                'songs': {
-                    "songs": [
-                        {
-                            "album": "test album",
-                            "date": "1980-01-02",
-                            "filename": "test_filename",
-                            "location": "New York, NY",
-                            "show_id": "test_show_id",
-                            "title": "test_title",
-                            "track": 1
-                        }
-                    ],
-                    "total": 1
-                },
+                'songs': {"songs": [], 'total': 1},
                 'songs_by_show': [
                     {
                         u'show': u'test album',
@@ -100,29 +87,7 @@ class SongsAPITestCase(APITestCase):
         self.assertEqual(
             json.loads(response.data),
             {
-                'songs': {
-                    u'songs': [
-                        {
-                            u'album': u'test album',
-                            u'date': u'1980-01-02',
-                            u'filename': u'test_filename',
-                            u'location': u'New York, NY',
-                            u'show_id': u'test_show_id',
-                            u'title': u'test_title',
-                            u'track': 1
-                        },
-                        {
-                            u'album': u'test album_2',
-                            u'date': u'1990-01-01',
-                            u'filename': u'test_filename_2',
-                            u'location': u'Bingo, NY',
-                            u'show_id': u'test_show_id_2',
-                            u'title': u'test_title_2',
-                            u'track': 2
-                        }
-                    ],
-                    u'total': 2
-                },
+                'songs': {'songs': [], 'total': 2},
                 u'songs_by_show': [
                     {
                         u'show': u'test album_2',
@@ -178,29 +143,7 @@ class SongsAPITestCase(APITestCase):
         self.assertEqual(
             json.loads(response.data),
             {
-                'songs': {
-                    u'songs': [
-                        {
-                            u'album': u'test album',
-                            u'date': u'1980-01-02',
-                            u'filename': u'test_filename',
-                            u'location': u'New York, NY',
-                            u'show_id': u'test_show_id',
-                            u'title': u'test_title',
-                            u'track': 1
-                        },
-                        {
-                            u'album': u'test album_2',
-                            u'date': u'1990-01-01',
-                            u'filename': u'test_filename_2',
-                            u'location': u'Bingo, NY',
-                            u'show_id': u'test_show_id_2',
-                            u'title': u'test_title_2',
-                            u'track': 2
-                        }
-                    ],
-                    u'total': 2
-                },
+                'songs': {'songs': [], 'total': 2},
                 u'songs_by_show': [
                     {
                         u'show': u'test album_2',

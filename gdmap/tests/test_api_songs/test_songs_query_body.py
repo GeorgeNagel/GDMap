@@ -27,8 +27,7 @@ class BuildQueryBodyTestCase(TestCase):
                         }
                     }
                 },
-                'from': 5,
-                'size': 5,
+                'size': 0,
                 'query': {
                     'match_all': {}
                 }
@@ -57,8 +56,7 @@ class BuildQueryBodyTestCase(TestCase):
                         }
                     }
                 },
-                'from': 5,
-                'size': 5,
+                'size': 0,
                 'query': {
                     'match_all': {}
                 },
@@ -87,8 +85,7 @@ class BuildQueryBodyTestCase(TestCase):
                         }
                     }
                 },
-                'from': 0,
-                'size': 10,
+                'size': 0,
                 'query': {
                     'multi_match': {
                         'fields': [
@@ -121,8 +118,7 @@ class BuildQueryBodyTestCase(TestCase):
                         }
                     }
                 },
-                'from': 0,
-                'size': 10,
+                'size': 0,
                 'query': {
                     'bool': {
                         'must': [{
@@ -156,8 +152,7 @@ class BuildQueryBodyTestCase(TestCase):
                         }
                     }
                 },
-                'from': 0,
-                'size': 10,
+                'size': 0,
                 'query': {
                     'bool': {
                         'must': [
@@ -198,7 +193,6 @@ class BuildQueryBodyTestCase(TestCase):
                         }
                     }
                 },
-                'from': 0,
                 'query': {
                     'filtered': {
                         'filter': {
@@ -209,7 +203,7 @@ class BuildQueryBodyTestCase(TestCase):
                         'query': {'match_all': {}}
                     }
                 },
-                'size': 10
+                'size': 0
             }
         )
 
@@ -221,8 +215,7 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
-                'from': 0,
-                'size': 10,
+                'size': 0,
                 'query': {
                     'bool': {
                         'must': [
