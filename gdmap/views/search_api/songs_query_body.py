@@ -5,23 +5,13 @@ from flask import abort
 def build_query_body(args):
     multi_field_query = None
     field_queries = []
-    # Get page information with defaults
-    page = args.get('page') or 1
+    # Get page and sort information with defaults
     per_page = args.get('per_page') or 10
+    sort_field = args.get('sort') or 'relevance'
+    sort_order = args.get('sort_order') or 'desc'
 
     # Don't return any hits, just aggregations
     query_body = {'size': 0}
-
-    # Sort results
-    sort_field = args.get('sort', None)
-    sort_order = args.get('sort_order') or 'asc'
-    if sort_field not in [None, 'title']:
-        abort(400)
-    if sort_order not in ['asc', 'desc']:
-        print "SORT ORDER: %s" % sort_order
-        abort(400)
-    if sort_field:
-        query_body['sort'] = [{sort_field: {"order": sort_order}}]
 
     # Get multi-field query body
     if args.get('q'):
@@ -65,19 +55,17 @@ def build_query_body(args):
         }
     else:
         query_body["query"] = terms_query
-    query_body['aggregations'] = _show_aggregations_body(per_page)
+    query_body['aggregations'] = _show_aggregations_body(per_page, sort_field, sort_order)
     return query_body
 
 
-def _show_aggregations_body(num_results, hits_per_show=1):
+def _show_aggregations_body(num_shows, sort_field, sort_order, hits_per_show=1):
     aggregations_body = {
         "shows": {
             "terms": {
                 "field": "album.raw",
-                "size": num_results,
-                "order": {
-                    "top_hit_score": "desc"
-                }
+                "size": num_shows,
+                "order": _build_sort(sort_field, sort_order)
             },
             "aggregations": {
                 "shows_hits": {
@@ -121,6 +109,18 @@ def _build_match_query(field, phrase):
             field: phrase
         }
     }
+
+
+def _build_sort(sort_field, sort_order):
+    """Sort aggregation buckets"""
+    if sort_field not in ['relevance', 'date']:
+        abort(400)
+    if sort_order not in ['asc', 'desc']:
+        abort(400)
+    if sort_field == 'relevance':
+        return {'top_hit_score': sort_order}
+    elif sort_field == 'date':
+        return {'top_hit_date': sort_order}
 
 
 def _build_date_filter(date_gte, date_lte):

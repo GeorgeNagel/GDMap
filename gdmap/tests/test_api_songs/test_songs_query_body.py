@@ -37,7 +37,7 @@ class BuildQueryBodyTestCase(TestCase):
     def test_sort(self):
         """Test the query body when a sort order is specified."""
         self.maxDiff = None
-        args = {'page': 2, 'per_page': 5, 'sort': 'title'}
+        args = {'sort': 'date', 'sort_order': 'asc'}
         query_body = build_query_body(args)
         self.assertEqual(
             query_body,
@@ -51,16 +51,15 @@ class BuildQueryBodyTestCase(TestCase):
                         },
                         'terms': {
                             'field': 'album.raw',
-                            'size': 5,
-                            'order': {'top_hit_score': 'desc'}
+                            'size': 10,
+                            'order': {'top_hit_date': 'asc'}
                         }
                     }
                 },
                 'size': 0,
                 'query': {
                     'match_all': {}
-                },
-                "sort": [{"title": {"order": "asc"}}]
+                }
             }
         )
 
