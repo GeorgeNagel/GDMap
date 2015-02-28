@@ -128,6 +128,21 @@ class SongsAPITestCase(APITestCase):
                 },
                 u'songs_by_show': [
                     {
+                        u'show': u'test album_2',
+                        u'songs': [
+                            {
+                                u'album': u'test album_2',
+                                u'date': u'1990-01-01',
+                                u'filename': u'test_filename_2',
+                                u'location': u'Bingo, NY',
+                                u'show_id': u'test_show_id_2',
+                                u'title': u'test_title_2',
+                                u'track': 2
+                            }
+                        ],
+                        u'total': 1
+                    },
+                    {
                         u'show': u'test album',
                         u'songs': [
                             {
@@ -140,7 +155,56 @@ class SongsAPITestCase(APITestCase):
                                 u'track': 1
                             }
                         ],
-                        u'total': 1},
+                        u'total': 1}
+                ]
+            }
+        )
+
+    @mongo_clean
+    def test_aggregation_sort(self):
+        """Test the aggregations are sorted by the top hit result."""
+        self.maxDiff = None
+        log.debug("Saving song in Mongo.")
+        # Save songs from show 1
+        self.test_song_1.save()
+        # Save songs from show 2
+        self.test_song_2.save()
+        self.assertEqual(Song.objects.count(), 2)
+
+        log.debug("Indexing test songs.")
+        index_songs()
+        # Wait for the song to be indexed
+        time.sleep(2)
+        log.debug("Getting all indexed songs.")
+        # Query for every song with 'test' in the title or elsewhere
+        response = self.app.get('/api/songs/?sort=title')
+        self.assertEqual(
+            json.loads(response.data),
+            {
+                'songs': {
+                    u'songs': [
+                        {
+                            u'album': u'test album',
+                            u'date': u'1980-01-02',
+                            u'filename': u'test_filename',
+                            u'location': u'New York, NY',
+                            u'show_id': u'test_show_id',
+                            u'title': u'test_title',
+                            u'track': 1
+                        },
+                        {
+                            u'album': u'test album_2',
+                            u'date': u'1990-01-01',
+                            u'filename': u'test_filename_2',
+                            u'location': u'Bingo, NY',
+                            u'show_id': u'test_show_id_2',
+                            u'title': u'test_title_2',
+                            u'track': 2
+                        }
+                    ],
+                    u'total': 2
+                },
+                u'songs_by_show': [
                     {
                         u'show': u'test album_2',
                         u'songs': [
@@ -155,7 +219,21 @@ class SongsAPITestCase(APITestCase):
                             }
                         ],
                         u'total': 1
-                    }
+                    },
+                    {
+                        u'show': u'test album',
+                        u'songs': [
+                            {
+                                u'album': u'test album',
+                                u'date': u'1980-01-02',
+                                u'filename': u'test_filename',
+                                u'location': u'New York, NY',
+                                u'show_id': u'test_show_id',
+                                u'title': u'test_title',
+                                u'track': 1
+                            }
+                        ],
+                        u'total': 1}
                 ]
             }
         )
@@ -168,6 +246,7 @@ class SongsAPITestCase(APITestCase):
 class BuildQueryBodyTestCase(TestCase):
     def test_page_info_only(self):
         """No parameters (other than page info) should give a match_all query."""
+        self.maxDiff = None
         args = {'page': 2, 'per_page': 5}
         query_body = _build_query_body(args)
         self.assertEqual(
@@ -176,9 +255,15 @@ class BuildQueryBodyTestCase(TestCase):
                 'aggregations': {
                     'shows': {
                         'aggregations': {
-                            'shows_hits': {'top_hits': {'size': 1}}
+                            'shows_hits': {'top_hits': {'size': 1}},
+                            "top_hit_score": {"max": {"script": "_score"}},
+                            "top_hit_date": {"avg": {"field": "date"}}
                         },
-                        'terms': {'field': 'album.raw', 'size': 5}
+                        'terms': {
+                            'field': 'album.raw',
+                            'size': 5,
+                            'order': {'top_hit_score': 'desc'}
+                        }
                     }
                 },
                 'from': 5,
@@ -191,6 +276,7 @@ class BuildQueryBodyTestCase(TestCase):
 
     def test_sort(self):
         """Test the query body when a sort order is specified."""
+        self.maxDiff = None
         args = {'page': 2, 'per_page': 5, 'sort': 'title'}
         query_body = _build_query_body(args)
         self.assertEqual(
@@ -199,9 +285,15 @@ class BuildQueryBodyTestCase(TestCase):
                 'aggregations': {
                     'shows': {
                         'aggregations': {
-                            'shows_hits': {'top_hits': {'size': 1}}
+                            'shows_hits': {'top_hits': {'size': 1}},
+                            "top_hit_score": {"max": {"script": "_score"}},
+                            "top_hit_date": {"avg": {"field": "date"}}
                         },
-                        'terms': {'field': 'album.raw', 'size': 5}
+                        'terms': {
+                            'field': 'album.raw',
+                            'size': 5,
+                            'order': {'top_hit_score': 'desc'}
+                        }
                     }
                 },
                 'from': 5,
@@ -214,6 +306,7 @@ class BuildQueryBodyTestCase(TestCase):
         )
 
     def test_multi_field_query(self):
+        self.maxDiff = None
         args = {'q': 'miss'}
         query_body = _build_query_body(args)
         self.assertEqual(
@@ -222,9 +315,15 @@ class BuildQueryBodyTestCase(TestCase):
                 'aggregations': {
                     'shows': {
                         'aggregations': {
-                            'shows_hits': {'top_hits': {'size': 1}}
+                            'shows_hits': {'top_hits': {'size': 1}},
+                            "top_hit_score": {"max": {"script": "_score"}},
+                            "top_hit_date": {"avg": {"field": "date"}}
                         },
-                        'terms': {'field': 'album.raw', 'size': 10}
+                        'terms': {
+                            'field': 'album.raw',
+                            'size': 10,
+                            'order': {'top_hit_score': 'desc'}
+                        }
                     }
                 },
                 'from': 0,
@@ -250,9 +349,15 @@ class BuildQueryBodyTestCase(TestCase):
                 'aggregations': {
                     'shows': {
                         'aggregations': {
-                            'shows_hits': {'top_hits': {'size': 1}}
+                            'shows_hits': {'top_hits': {'size': 1}},
+                            "top_hit_score": {"max": {"script": "_score"}},
+                            "top_hit_date": {"avg": {"field": "date"}}
                         },
-                        'terms': {'field': 'album.raw', 'size': 10}
+                        'terms': {
+                            'field': 'album.raw',
+                            'size': 10,
+                            'order': {'top_hit_score': 'desc'}
+                        }
                     }
                 },
                 'from': 0,
@@ -279,9 +384,15 @@ class BuildQueryBodyTestCase(TestCase):
                 'aggregations': {
                     'shows': {
                         'aggregations': {
-                            'shows_hits': {'top_hits': {'size': 1}}
+                            'shows_hits': {'top_hits': {'size': 1}},
+                            "top_hit_score": {"max": {"script": "_score"}},
+                            "top_hit_date": {"avg": {"field": "date"}}
                         },
-                        'terms': {'field': 'album.raw', 'size': 10}
+                        'terms': {
+                            'field': 'album.raw',
+                            'size': 10,
+                            'order': {'top_hit_score': 'desc'}
+                        }
                     }
                 },
                 'from': 0,
@@ -306,6 +417,7 @@ class BuildQueryBodyTestCase(TestCase):
         )
 
     def test_date_filters_query(self):
+        self.maxDiff = None
         args = {'date_gte': "1990", 'date_lte': '1995-01-02'}
         query_body = _build_query_body(args)
         self.assertEqual(
@@ -314,9 +426,15 @@ class BuildQueryBodyTestCase(TestCase):
                 'aggregations': {
                     'shows': {
                         'aggregations': {
-                            'shows_hits': {'top_hits': {'size': 1}}
+                            'shows_hits': {'top_hits': {'size': 1}},
+                            "top_hit_score": {"max": {"script": "_score"}},
+                            "top_hit_date": {"avg": {"field": "date"}}
                         },
-                        'terms': {'field': 'album.raw', 'size': 10}
+                        'terms': {
+                            'field': 'album.raw',
+                            'size': 10,
+                            'order': {'top_hit_score': 'desc'}
+                        }
                     }
                 },
                 'from': 0,
@@ -336,6 +454,7 @@ class BuildQueryBodyTestCase(TestCase):
 
     def combined_query(self):
         """Test the case of a multifield query and targeted query."""
+        self.maxDiff = None
         args = {'q': 'diplo', 'track': 4, 'title': 'miss'}
         query_body = _build_query_body(args)
         self.assertEqual(
@@ -374,6 +493,7 @@ class BuildQueryBodyTestCase(TestCase):
 
 class BuildMultiFieldQueryTestCase(TestCase):
     def test_build_multi_field_query(self):
+        self.maxDiff = None
         phrase = "miss"
         query_body = _build_multi_field_query(phrase)
         self.assertEqual(

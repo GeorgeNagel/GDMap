@@ -123,12 +123,27 @@ def _show_aggregations_body(num_results, hits_per_show=1):
         "shows": {
             "terms": {
                 "field": "album.raw",
-                "size": num_results
+                "size": num_results,
+                "order": {
+                    "top_hit_score": "desc"
+                }
             },
             "aggregations": {
                 "shows_hits": {
+                    # Return the top matching song per "album"
                     "top_hits": {
                         "size": hits_per_show
+                    }
+                },
+                # Return the score of the top matching song per "album"
+                "top_hit_score": {
+                    "max": {
+                        "script": "_score"
+                    }
+                },
+                "top_hit_date": {
+                    "avg": {
+                        "field": "date"
                     }
                 }
             }
