@@ -5,35 +5,6 @@ from gdmap.views.search_api.songs_query_body import build_query_body, \
 
 
 class BuildQueryBodyTestCase(TestCase):
-    def test_page_info_only(self):
-        """No parameters (other than page info) should give a match_all query."""
-        self.maxDiff = None
-        args = {'page': 2, 'per_page': 5}
-        query_body = build_query_body(args)
-        self.assertEqual(
-            query_body,
-            {
-                'aggregations': {
-                    'shows': {
-                        'aggregations': {
-                            'shows_hits': {'top_hits': {'size': 1}},
-                            "top_hit_score": {"max": {"script": "_score"}},
-                            "top_hit_date": {"avg": {"field": "date"}}
-                        },
-                        'terms': {
-                            'field': 'album.raw',
-                            'size': 5,
-                            'order': {'top_hit_score': 'desc'}
-                        }
-                    }
-                },
-                'size': 0,
-                'query': {
-                    'match_all': {}
-                }
-            }
-        )
-
     def test_sort(self):
         """Test the query body when a sort order is specified."""
         self.maxDiff = None
@@ -51,7 +22,7 @@ class BuildQueryBodyTestCase(TestCase):
                         },
                         'terms': {
                             'field': 'album.raw',
-                            'size': 10,
+                            'size': 0,
                             'order': {'top_hit_date': 'asc'}
                         }
                     }
@@ -79,7 +50,7 @@ class BuildQueryBodyTestCase(TestCase):
                         },
                         'terms': {
                             'field': 'album.raw',
-                            'size': 10,
+                            'size': 0,
                             'order': {'top_hit_score': 'desc'}
                         }
                     }
@@ -112,7 +83,7 @@ class BuildQueryBodyTestCase(TestCase):
                         },
                         'terms': {
                             'field': 'album.raw',
-                            'size': 10,
+                            'size': 0,
                             'order': {'top_hit_score': 'desc'}
                         }
                     }
@@ -146,7 +117,7 @@ class BuildQueryBodyTestCase(TestCase):
                         },
                         'terms': {
                             'field': 'album.raw',
-                            'size': 10,
+                            'size': 0,
                             'order': {'top_hit_score': 'desc'}
                         }
                     }
@@ -187,7 +158,7 @@ class BuildQueryBodyTestCase(TestCase):
                         },
                         'terms': {
                             'field': 'album.raw',
-                            'size': 10,
+                            'size': 0,
                             'order': {'top_hit_score': 'desc'}
                         }
                     }
@@ -206,7 +177,7 @@ class BuildQueryBodyTestCase(TestCase):
             }
         )
 
-    def combined_query(self):
+    def test_combined_query(self):
         """Test the case of a multifield query and targeted query."""
         self.maxDiff = None
         args = {'q': 'diplo', 'track': 4, 'title': 'miss'}
@@ -214,6 +185,20 @@ class BuildQueryBodyTestCase(TestCase):
         self.assertEqual(
             query_body,
             {
+                'aggregations': {
+                    'shows': {
+                        'aggregations': {
+                            'shows_hits': {'top_hits': {'size': 1}},
+                            "top_hit_score": {"max": {"script": "_score"}},
+                            "top_hit_date": {"avg": {"field": "date"}}
+                        },
+                        'terms': {
+                            'field': 'album.raw',
+                            'size': 0,
+                            'order': {'top_hit_score': 'desc'}
+                        }
+                    }
+                },
                 'size': 0,
                 'query': {
                     'bool': {
@@ -234,7 +219,7 @@ class BuildQueryBodyTestCase(TestCase):
                                         'sha1', 'show_id', 'filename',
                                         'album', 'title', 'location'
                                     ],
-                                    'query': 'miss'
+                                    'query': 'diplo'
                                 }
                             }
                         ]

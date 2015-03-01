@@ -49,7 +49,7 @@ class SongResource(Resource):
         args = parser.parse_args()
         query_body = build_query_body(args)
         query_result = query_es(query_body)
-        formatted_result = format_result(query_result)
+        formatted_result = format_result(query_result, args)
         return formatted_result
 
 

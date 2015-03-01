@@ -5,8 +5,7 @@ from flask import abort
 def build_query_body(args):
     multi_field_query = None
     field_queries = []
-    # Get page and sort information with defaults
-    per_page = args.get('per_page') or 10
+    # Get sort information with defaults
     sort_field = args.get('sort') or 'relevance'
     sort_order = args.get('sort_order') or 'desc'
 
@@ -55,16 +54,17 @@ def build_query_body(args):
         }
     else:
         query_body["query"] = terms_query
-    query_body['aggregations'] = _show_aggregations_body(per_page, sort_field, sort_order)
+    query_body['aggregations'] = _show_aggregations_body(sort_field, sort_order)
     return query_body
 
 
-def _show_aggregations_body(num_shows, sort_field, sort_order, hits_per_show=1):
+def _show_aggregations_body(sort_field, sort_order, hits_per_show=1):
     aggregations_body = {
         "shows": {
             "terms": {
                 "field": "album.raw",
-                "size": num_shows,
+                # Return all buckets and paginate them in format_result()
+                "size": 0,
                 "order": _build_sort(sort_field, sort_order)
             },
             "aggregations": {
