@@ -1,7 +1,7 @@
 """Utilities to format songs results from elasticsearch."""
 
 
-def format_result(es_result, args):
+def format_songs_by_show(es_result, args):
     """Return the formatted songs grouped by show."""
     # Get bucket pagination arguments
     page = args.get('page') or 1
@@ -28,3 +28,15 @@ def format_result(es_result, args):
             clean_songs.append(song['_source'])
         songs_by_shows.append({'show': show_name, 'total': total, 'songs': clean_songs})
     return {'songs_by_show': songs_by_shows}
+
+
+def format_songs(es_result):
+    """Return the formatted songs."""
+    total = es_result['hits']['total']
+    songs = es_result['hits']['hits']
+    # Clean the elasticsearch ids from the songs
+    clean_songs = []
+    for song in songs:
+        data = song['_source']
+        clean_songs.append(data)
+    return {'total': total, 'songs': clean_songs}

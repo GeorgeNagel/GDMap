@@ -14,6 +14,11 @@ define([
         var songs = []
         $.each(response.songs_by_show, function(index, show) {
             var showSongs = show.songs;
+            // Track the number of other song recordings that matched this query
+            var total = show.total;
+            $.each(showSongs, function(index, song) {
+                song.num_related = total - 1;
+            });
             songs = songs.concat(showSongs);
         });
         return songs;

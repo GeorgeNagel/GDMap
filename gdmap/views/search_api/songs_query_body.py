@@ -2,15 +2,25 @@
 from flask import abort
 
 
-def build_query_body(args):
+def build_songs_query(args):
+    query_body = _build_query_body(args)
+    # Add pagination and sorting, modifying query_body in-place
+    query_sort(query_body, args)
+    query_pagination(query_body, args)
+    return query_body
+
+
+def build_songs_by_show_query(args):
+    query_body = _build_query_body(args)
+    query_body['aggregations'] = show_aggregations_body(args)
+    # Don't return any hits, just aggregations
+    query_body['size'] = 0
+    return query_body
+
+
+def _build_query_body(args):
     multi_field_query = None
     field_queries = []
-    # Get sort information with defaults
-    sort_field = args.get('sort') or 'relevance'
-    sort_order = args.get('sort_order') or 'desc'
-
-    # Don't return any hits, just aggregations
-    query_body = {'size': 0}
 
     # Get multi-field query body
     if args.get('q'):
@@ -45,6 +55,7 @@ def build_query_body(args):
         }
     else:
         terms_query = {"match_all": {}}
+    query_body = {}
     if filter_body:
         query_body["query"] = {
             "filtered": {
@@ -54,18 +65,46 @@ def build_query_body(args):
         }
     else:
         query_body["query"] = terms_query
-    query_body['aggregations'] = _show_aggregations_body(sort_field, sort_order)
     return query_body
 
 
-def _show_aggregations_body(sort_field, sort_order, hits_per_show=1):
+def query_sort(query_body, args):
+    """Add sorting for raw songs results (non-aggregated).
+    Modifies query_body in-place.
+    """
+    # Sort results
+    sort_field = args.get('sort') or None
+    sort_order = args.get('sort_order') or 'asc'
+    if sort_field not in [None, 'title', 'date']:
+        abort(400)
+    if sort_order not in ['asc', 'desc']:
+        abort(400)
+    if sort_field:
+        query_body['sort'] = [{sort_field: {"order": sort_order}}]
+
+
+def query_pagination(query_body, args):
+    """Add pagination for raw songs results (non-aggregated).
+    Modifies query_body in-place.
+    """
+    per_page = args.get('per_page') or 10
+    page = args.get('page') or 1
+
+    query_body['from'] = (page - 1) * per_page
+    query_body['size'] = per_page
+
+
+def show_aggregations_body(args, hits_per_show=1):
+    # Get sort information with defaults
+    sort_field = args.get('sort') or 'relevance'
+    sort_order = args.get('sort_order') or 'desc'
     aggregations_body = {
         "shows": {
             "terms": {
                 "field": "album.raw",
                 # Return all buckets and paginate them in format_result()
                 "size": 0,
-                "order": _build_sort(sort_field, sort_order)
+                "order": _aggregation_sort(sort_field, sort_order)
             },
             "aggregations": {
                 "shows_hits": {
@@ -111,7 +150,7 @@ def _build_match_query(field, phrase):
     }
 
 
-def _build_sort(sort_field, sort_order):
+def _aggregation_sort(sort_field, sort_order):
     """Sort aggregation buckets"""
     if sort_field not in ['relevance', 'date']:
         abort(400)

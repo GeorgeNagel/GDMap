@@ -8,8 +8,9 @@ def index():
     return render_template('base.html')
 
 
-@app.route('/songs/')
-def songs():
+@app.route('/songs/', defaults={'query': None})
+@app.route('/songs/<query>')
+def songs(query):
     return render_template('base.html')
 
 
