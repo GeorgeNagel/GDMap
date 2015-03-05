@@ -48,81 +48,24 @@ class SongsAPITestCase(APITestCase):
         self.assertEqual(
             json.loads(response.data),
             {
-                'songs_by_show': [
+                u'songs': [
                     {
-                        u'show': u'test album',
-                        u'songs': [
-                            {
-                                u'album': u'test album',
-                                u'date': u'1980-01-02',
-                                u'filename': u'test_filename',
-                                u'location': u'New York, NY',
-                                u'show_id': u'test_show_id',
-                                u'title': u'test_title',
-                                u'track': 1
-                            },
-                        ],
-                        u'total': 1}]}
-        )
-
-    @mongo_clean
-    def test_aggregation_sort(self):
-        """Test sorting the show aggregation."""
-        self.maxDiff = None
-        log.debug("Saving song in Mongo.")
-        # Save songs from show 1
-        self.test_song_1.save()
-        # Save songs from show 2
-        self.test_song_2.save()
-        self.assertEqual(Song.objects.count(), 2)
-
-        log.debug("Indexing test songs.")
-        index_songs()
-        # Wait for the song to be indexed
-        time.sleep(2)
-        log.debug("Getting all indexed songs.")
-        # Query for every song with 'test' in the title or elsewhere
-        response = self.app.get('/api/songs/?sort=date&order=desc')
-        self.assertEqual(
-            json.loads(response.data),
-            {
-                u'songs_by_show': [
-                    {
-                        u'show': u'test album_2',
-                        u'songs': [
-                            {
-                                u'album': u'test album_2',
-                                u'date': u'1990-01-01',
-                                u'filename': u'test_filename_2',
-                                u'location': u'Bingo, NY',
-                                u'show_id': u'test_show_id_2',
-                                u'title': u'test_title_2',
-                                u'track': 2
-                            }
-                        ],
-                        u'total': 1
+                        u'album': u'test album',
+                        u'date': u'1980-01-02',
+                        u'filename': u'test_filename',
+                        u'location': u'New York, NY',
+                        u'show_id': u'test_show_id',
+                        u'title': u'test_title',
+                        u'track': 1
                     },
-                    {
-                        u'show': u'test album',
-                        u'songs': [
-                            {
-                                u'album': u'test album',
-                                u'date': u'1980-01-02',
-                                u'filename': u'test_filename',
-                                u'location': u'New York, NY',
-                                u'show_id': u'test_show_id',
-                                u'title': u'test_title',
-                                u'track': 1
-                            }
-                        ],
-                        u'total': 1}
-                ]
+                ],
+                u'total': 1
             }
         )
 
     @mongo_clean
-    def test_aggregation_pagination(self):
-        """Test paginating the show aggregation."""
+    def test_sort(self):
+        """Test sorting the songs."""
         self.maxDiff = None
         log.debug("Saving song in Mongo.")
         # Save songs from show 1
@@ -137,26 +80,103 @@ class SongsAPITestCase(APITestCase):
         time.sleep(2)
         log.debug("Getting all indexed songs.")
         # Query for every song with 'test' in the title or elsewhere
-        response = self.app.get('/api/songs/?sort=date&order=desc&page=2&per_page=1')
+        response = self.app.get('/api/songs/?sort=date&sort_order=desc')
         self.assertEqual(
             json.loads(response.data),
             {
-                u'songs_by_show': [
+                u'songs': [
                     {
-                        u'show': u'test album',
-                        u'songs': [
-                            {
-                                u'album': u'test album',
-                                u'date': u'1980-01-02',
-                                u'filename': u'test_filename',
-                                u'location': u'New York, NY',
-                                u'show_id': u'test_show_id',
-                                u'title': u'test_title',
-                                u'track': 1
-                            }
-                        ],
-                        u'total': 1}
-                ]
+                        u'album': u'test album_2',
+                        u'date': u'1990-01-01',
+                        u'filename': u'test_filename_2',
+                        u'location': u'Bingo, NY',
+                        u'show_id': u'test_show_id_2',
+                        u'title': u'test_title_2',
+                        u'track': 2
+                    },
+                    {
+                        u'album': u'test album',
+                        u'date': u'1980-01-02',
+                        u'filename': u'test_filename',
+                        u'location': u'New York, NY',
+                        u'show_id': u'test_show_id',
+                        u'title': u'test_title',
+                        u'track': 1
+                    }
+                ],
+                u'total': 2
+            }
+        )
+
+    @mongo_clean
+    def test_pagination(self):
+        """Test paginating the songs."""
+        self.maxDiff = None
+        log.debug("Saving song in Mongo.")
+        # Save songs from show 1
+        self.test_song_1.save()
+        # Save songs from show 2
+        self.test_song_2.save()
+        self.assertEqual(Song.objects.count(), 2)
+
+        log.debug("Indexing test songs.")
+        index_songs()
+        # Wait for the song to be indexed
+        time.sleep(2)
+        log.debug("Getting all indexed songs.")
+        # Query for every song with 'test' in the title or elsewhere
+        response = self.app.get('/api/songs/?sort=date&sort_order=asc&page=2&per_page=1')
+        self.assertEqual(
+            json.loads(response.data),
+            {
+                u'songs': [
+                    {
+                        u'album': u'test album_2',
+                        u'date': u'1990-01-01',
+                        u'filename': u'test_filename_2',
+                        u'location': u'Bingo, NY',
+                        u'show_id': u'test_show_id_2',
+                        u'title': u'test_title_2',
+                        u'track': 2
+                    }
+                ],
+                u'total': 2
+            }
+        )
+
+    @mongo_clean
+    def test_album_search(self):
+        """Test paginating the songs."""
+        self.maxDiff = None
+        log.debug("Saving song in Mongo.")
+        # Save songs from show 1
+        self.test_song_1.save()
+        # Save songs from show 2
+        self.test_song_2.save()
+        self.assertEqual(Song.objects.count(), 2)
+
+        log.debug("Indexing test songs.")
+        index_songs()
+        # Wait for the song to be indexed
+        time.sleep(2)
+        log.debug("Getting all indexed songs.")
+        # Query for every song with 'test' in the title or elsewhere
+        response = self.app.get('/api/songs/?album=test album_2')
+        self.assertEqual(
+            json.loads(response.data),
+            {
+                u'songs': [
+                    {
+                        u'album': u'test album_2',
+                        u'date': u'1990-01-01',
+                        u'filename': u'test_filename_2',
+                        u'location': u'Bingo, NY',
+                        u'show_id': u'test_show_id_2',
+                        u'title': u'test_title_2',
+                        u'track': 2
+                    }
+                ],
+                u'total': 1
             }
         )
 

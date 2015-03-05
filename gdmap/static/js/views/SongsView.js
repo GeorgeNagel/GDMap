@@ -1,15 +1,14 @@
 define([
   'backbone',
-  'collections/SongsByShowCollection',
+  'collections/SongsCollection',
   'views/SongView'
-], function(Backbone, SongsByShowCollection, SongView){
+], function(Backbone, SongsCollection, SongView){
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
     initialize: function(options) {
       var self = this;
-      self.options = options;
-      var songs = new SongsByShowCollection([], options);
+      var songs = new SongsCollection([], options);
       songs.fetch({
         success: function() {
           self.render()
@@ -19,9 +18,9 @@ define([
     },
     render: function(){
       var self = this;
-      self.$el.html("<h1>Search</h1>")
+      self.$el.html("<h1>Songs</h1>")
       self.songs.each(function(song) {
-        var view = new SongView(song, self.options);
+        var view = new SongView(song);
         self.$el.append(view.render());
       });
     }
