@@ -26,17 +26,24 @@ def _build_query_body(args):
     if args.get('q'):
         multi_field_query = _build_multi_field_query(args.get('q'))
     # Get targeted query bodies
-    fields = ['sha1', 'show_id', 'filename', 'album', 'title', 'location', 'track']
+    fields = ['sha1', 'show_id', 'filename', 'title', 'location', 'track']
     for field in fields:
         if args.get(field):
             phrase = args.get(field)
             field_query = _build_match_query(field, phrase)
             field_queries.append(field_query)
     # Get date filters
-    date_gte = args.get('date_gte', None)
-    date_lte = args.get('date_lte', None)
+    date_gte = args.get('date_gte')
+    date_lte = args.get('date_lte')
 
-    filter_body = _build_date_filter(date_gte, date_lte)
+    date_filter_body = _build_date_filter(date_gte, date_lte)
+
+    # Get album filter
+    album = args.get('album')
+    album_filter_body = _build_album_filter(album)
+
+    filter_body = _build_filter(date_filter_body, album_filter_body)
+
     terms_query = None
     if multi_field_query and field_queries:
         must_queries = field_queries + [multi_field_query]
@@ -74,7 +81,7 @@ def query_sort(query_body, args):
     """
     # Sort results
     sort_field = args.get('sort') or None
-    sort_order = args.get('sort_order') or 'asc'
+    sort_order = args.get('sort_order') or 'desc'
     if sort_field not in [None, 'title', 'date']:
         abort(400)
     if sort_order not in ['asc', 'desc']:
@@ -162,6 +169,18 @@ def _aggregation_sort(sort_field, sort_order):
         return {'top_hit_date': sort_order}
 
 
+def _build_filter(date_filter_body, album_filter_body):
+    if date_filter_body and album_filter_body:
+        filter_body = {"and": [date_filter_body, album_filter_body]}
+        return filter_body
+    elif date_filter_body:
+        return date_filter_body
+    elif album_filter_body:
+        return album_filter_body
+    else:
+        return None
+
+
 def _build_date_filter(date_gte, date_lte):
     if not date_gte and not date_lte:
         return None
@@ -171,3 +190,9 @@ def _build_date_filter(date_gte, date_lte):
     if date_lte:
         filter_body["range"]["date"]["lte"] = date_lte
     return filter_body
+
+
+def _build_album_filter(album):
+    if not album:
+        return None
+    return {"term": {"album.raw": album}}

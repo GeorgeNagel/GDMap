@@ -20,7 +20,7 @@ define([
       var self = this;
       self.$el.html("<h1>Songs</h1>")
       self.songs.each(function(song) {
-        var view = new SongView({model: song});
+        var view = new SongView(song);
         self.$el.append(view.render());
       });
     }

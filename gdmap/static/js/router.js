@@ -8,6 +8,7 @@ define([
   "views/SongsView",
   "views/ShowView",
 ], function($, _, Backbone, IndexView, SearchView, SongsView, ShowView){
+  "use strict";
   var AppRouter = Backbone.Router.extend({
     routes: {
       "": "index",
@@ -37,7 +38,7 @@ define([
       showView.render();
     },
     defaultAction: function(actions) {
-        console.log("No route:", actions);
+      console.log("No route:", actions);
     }
   });
 

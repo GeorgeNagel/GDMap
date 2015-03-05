@@ -15,8 +15,11 @@ parser.add_argument('sha1', type=str)
 # Search by location name
 parser.add_argument('location', type=str)
 
-# Filter by track number
+# Search by track number
 parser.add_argument('track', type=int)
+
+# Filter by album name (concert name)
+parser.add_argument('album', type=str)
 
 # Results per page
 parser.add_argument('per_page', type=int)

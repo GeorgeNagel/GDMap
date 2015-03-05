@@ -149,6 +149,51 @@ class BuildQueryBodyTestCase(TestCase):
             }
         )
 
+    def test_album_query(self):
+        """Test querying for a specific album."""
+        self.maxDiff = None
+        args = {'album': '1970 Dingle Park'}
+        query_body = _build_query_body(args)
+        self.assertEqual(
+            query_body,
+            {
+                'query': {
+                    'filtered': {
+                        'filter': {
+                            'term': {'album.raw': '1970 Dingle Park'}
+                        },
+                        'query': {'match_all': {}}
+                    }
+                }
+            }
+        )
+
+    def test_multiple_filters(self):
+        """Test when multiple filters are active."""
+        self.maxDiff = None
+        args = {'album': '1970 Dingle Park', 'date_gte': "1950"}
+        query_body = _build_query_body(args)
+        self.assertEqual(
+            query_body,
+            {
+                'query': {
+                    'filtered': {
+                        'filter': {
+                            'and': [
+                                {
+                                    'range': {'date': {'gte': '1950'}}
+                                },
+                                {
+                                    'term': {'album.raw': '1970 Dingle Park'}
+                                }
+                            ]
+                        },
+                        'query': {'match_all': {}}
+                    }
+                }
+            }
+        )
+
 
 class BuildMultiFieldQueryTestCase(TestCase):
     def test_build_multi_field_query(self):
