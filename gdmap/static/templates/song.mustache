@@ -1,6 +1,10 @@
 <li>
-<div>Concert: <a href="/show/{{show_id}}">{{album}}</a></div>
-<div>Title: {{title}}</div>
-<iframe src="https://archive.org/embed/{{show_id}}/{{filename}}" width="500" height="30" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen></iframe>
-<div> <a href="{{songs_url}}">And {{num_related}} others</a> </div>
+  <div>Concert: <a href="/show/{{show_id}}">{{album}}</a></div>
+  <div>
+    <span>Title: {{title}}</span>
+    {{# num_related }}
+    <span> <a href="{{songs_url}}">And {{num_related}} others</a> </span>
+    {{/ num_related }}
+  </div>
+  <iframe src="https://archive.org/embed/{{show_id}}/{{filename}}" width="500" height="30" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen></iframe>
 </li>
