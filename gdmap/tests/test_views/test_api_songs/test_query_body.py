@@ -2,15 +2,15 @@ from unittest import TestCase
 
 from gdmap.views.search_api.songs_query_body import _build_query_body, \
     _build_multi_field_query, _build_match_query, _build_date_filter, \
-    show_aggregations_body, build_songs_query
+    aggregations_body, build_songs_query, build_recordings_query
 
 
 class BuildQueryBodyTestCase(TestCase):
-    def test_sort_aggregation(self):
+    def test_sort_shows_aggregation(self):
         """Test the query body when a sort order is specified."""
         self.maxDiff = None
         args = {'sort': 'date', 'sort_order': 'asc'}
-        query_body = show_aggregations_body(args)
+        query_body = aggregations_body(args, 'album.raw', 'shows')
         self.assertEqual(
             query_body,
             {
@@ -26,6 +26,33 @@ class BuildQueryBodyTestCase(TestCase):
                         'order': {'top_hit_date': 'asc'}
                     }
                 }
+            }
+        )
+
+    def test_recordings_aggregation(self):
+        """Test the recordings aggregation."""
+        self.maxDiff = None
+        args = {'sort': 'date', 'sort_order': 'asc'}
+        query_body = build_recordings_query(args)
+        self.assertEqual(
+            query_body,
+            {
+                'aggregations': {
+                    'recordings': {
+                        'aggregations': {
+                            'recordings_hits': {'top_hits': {'size': 1}},
+                            'top_hit_date': {'avg': {'field': 'date'}},
+                            'top_hit_score': {'max': {'script': '_score'}}
+                        },
+                        'terms': {
+                            'field': 'show_id',
+                            'order': {'top_hit_date': 'asc'},
+                            'size': 0
+                        }
+                    }
+                },
+                'query': {'match_all': {}},
+                'size': 0
             }
         )
 

@@ -12,7 +12,15 @@ def build_songs_query(args):
 
 def build_songs_by_show_query(args):
     query_body = _build_query_body(args)
-    query_body['aggregations'] = show_aggregations_body(args)
+    query_body['aggregations'] = aggregations_body(args, 'album.raw', 'shows')
+    # Don't return any hits, just aggregations
+    query_body['size'] = 0
+    return query_body
+
+
+def build_recordings_query(args):
+    query_body = _build_query_body(args)
+    query_body['aggregations'] = aggregations_body(args, 'show_id', 'recordings')
     # Don't return any hits, just aggregations
     query_body['size'] = 0
     return query_body
@@ -101,25 +109,19 @@ def query_pagination(query_body, args):
     query_body['size'] = per_page
 
 
-def show_aggregations_body(args, hits_per_show=1):
+def aggregations_body(args, field_to_aggregate, aggregation_name, hits_per_bucket=1):
     # Get sort information with defaults
     sort_field = args.get('sort') or 'relevance'
     sort_order = args.get('sort_order') or 'desc'
     aggregations_body = {
-        "shows": {
+        aggregation_name: {
             "terms": {
-                "field": "album.raw",
+                "field": field_to_aggregate,
                 # Return all buckets and paginate them in format_result()
                 "size": 0,
                 "order": _aggregation_sort(sort_field, sort_order)
             },
             "aggregations": {
-                "shows_hits": {
-                    # Return the top matching song per "album"
-                    "top_hits": {
-                        "size": hits_per_show
-                    }
-                },
                 # Return the score of the top matching song per "album"
                 "top_hit_score": {
                     "max": {
@@ -134,6 +136,13 @@ def show_aggregations_body(args, hits_per_show=1):
             }
         }
     }
+    if hits_per_bucket:
+        # Add top hits results in each bucket
+        aggregations_body[aggregation_name]['aggregations']['%s_hits' % aggregation_name] = {
+            "top_hits": {
+                "size": hits_per_bucket
+            }
+        }
     return aggregations_body
 
 

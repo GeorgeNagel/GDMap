@@ -6,17 +6,24 @@ define([
   "views/IndexView",
   "views/SearchView",
   "views/SongsView",
-  "views/ShowView",
-], function($, _, Backbone, IndexView, SearchView, SongsView, ShowView){
+  "views/RecordingView",
+  "views/RecordingsView"
+], function($, _, Backbone, IndexView, SearchView, SongsView, RecordingView, RecordingsView){
   "use strict";
   var AppRouter = Backbone.Router.extend({
     routes: {
       "": "index",
+
       "search/": "searchSongs",
       "search/?:query": "searchSongs",
+
       "songs/": "songs",
       "songs/?:query": "songs",
-      "show/:show_id": "show",
+
+      "recording/:show_id": "recording",
+
+      "recordings/": "recordings",
+      "recordings/?:query": "recordings",
 
       // Default
       "*actions": "defaultAction"
@@ -33,9 +40,13 @@ define([
       var songsView = new SongsView({"query": query});
       songsView.render();
     },
-    show: function(show_id) {
-      var showView = new ShowView({"show_id": show_id});
-      showView.render();
+    recording: function(show_id) {
+      var recordingView = new RecordingView({"show_id": show_id});
+      recordingView.render();
+    },
+    recordings: function(query) {
+      var recordingsView = new RecordingsView({"query": query});
+      recordingsView.render();
     },
     defaultAction: function(actions) {
       console.log("No route:", actions);
