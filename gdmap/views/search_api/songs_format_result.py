@@ -24,7 +24,7 @@ def format_recordings(es_result, args):
     for recording_bucket in recording_buckets:
         recording_id = recording_bucket['key']
         total = recording_bucket['doc_count']
-        recordings.append({'recording': recording_id, 'total': total})
+        recordings.append({'show_id': recording_id, 'total': total})
     total_hits = es_result['hits']['total']
     return {'recordings': recordings, 'total': total_hits}
 

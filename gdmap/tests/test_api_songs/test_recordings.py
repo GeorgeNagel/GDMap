@@ -60,9 +60,9 @@ class SongsAPITestCase(APITestCase):
             json.loads(response.data),
             {
                 u'recordings': [
-                    {u'recording': u'test_show_id_3', u'total': 1},
-                    {u'recording': u'test_show_id_1', u'total': 1},
-                    {u'recording': u'test_show_id_2', u'total': 1}
+                    {u'show_id': u'test_show_id_3', u'total': 1},
+                    {u'show_id': u'test_show_id_1', u'total': 1},
+                    {u'show_id': u'test_show_id_2', u'total': 1}
                 ],
                 'total': 3
             }
