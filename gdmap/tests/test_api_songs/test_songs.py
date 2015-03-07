@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 class SongsAPITestCase(APITestCase):
     def setUp(self):
-        # Two songs from the same show
+        # Songs from one show
         self.test_song_1 = Song(sha1='abc123',
                                 show_id='test_show_id',
                                 filename='test_filename',
