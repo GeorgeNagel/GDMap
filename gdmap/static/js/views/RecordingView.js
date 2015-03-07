@@ -1,8 +1,8 @@
 define([
   'backbone',
   'mustache',
-  'text!templates/show.mustache'
-], function(Backbone, Mustache, showtemplate){
+  'text!templates/recording.mustache'
+], function(Backbone, Mustache, recordingtemplate){
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
@@ -11,8 +11,8 @@ define([
     },
     render: function(){
       var self = this;
-      self.$el.html("<h1>Show</h1>");
-      var rendered = Mustache.render(showtemplate, {show_id: this.showID});
+      self.$el.html("<h1>Recording</h1>");
+      var rendered = Mustache.render(recordingtemplate, {show_id: this.showID});
       self.$el.append(rendered);
     }
   })

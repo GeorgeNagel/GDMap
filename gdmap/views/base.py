@@ -20,6 +20,12 @@ def search(query):
     return render_template('base.html')
 
 
-@app.route('/show/<show_id>')
-def show(show_id):
+@app.route('/recording/<show_id>')
+def recording(show_id):
+    return render_template('base.html')
+
+
+@app.route('/recordings/', defaults={'query': None})
+@app.route('/recordings/<query>')
+def recordings(query):
     return render_template('base.html')
