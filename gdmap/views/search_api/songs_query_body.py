@@ -12,7 +12,7 @@ def build_songs_query(args):
 
 def build_songs_by_show_query(args):
     query_body = _build_query_body(args)
-    query_body['aggregations'] = aggregations_body(args, 'album.raw', 'shows', hits_per_bucket=1)
+    query_body['aggregations'] = aggregations_body(args, 'album.raw', 'shows')
     # Don't return any hits, just aggregations
     query_body['size'] = 0
     return query_body
@@ -20,7 +20,7 @@ def build_songs_by_show_query(args):
 
 def build_recordings_query(args):
     query_body = _build_query_body(args)
-    query_body['aggregations'] = aggregations_body(args, 'show_id', 'recordings', hits_per_bucket=0)
+    query_body['aggregations'] = aggregations_body(args, 'show_id', 'recordings')
     # Don't return any hits, just aggregations
     query_body['size'] = 0
     return query_body

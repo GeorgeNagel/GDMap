@@ -22,9 +22,16 @@ def format_recordings(es_result, args):
     recording_buckets = _paginate_aggregation(es_result, args, 'recordings')
     recordings = []
     for recording_bucket in recording_buckets:
-        recording_id = recording_bucket['key']
-        total = recording_bucket['doc_count']
-        recordings.append({'show_id': recording_id, 'total': total})
+        # Grab the relevant info from the first returned song for this bucket
+        song = recording_bucket['recordings_hits']['hits']['hits'][0]
+        song_info = song['_source']
+        song_info.pop('title')
+        song_info.pop('track')
+        song_info.pop('filename')
+        recording_info = song_info
+        total = recording_bucket['recordings_hits']['hits']['total']
+        recording_info['total'] = total
+        recordings.append(recording_info)
     total_hits = es_result['hits']['total']
     return {'recordings': recordings, 'total': total_hits}
 

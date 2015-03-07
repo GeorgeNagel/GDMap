@@ -12,7 +12,7 @@ define([
       var songs = new SongsByShowCollection([], options);
       songs.fetch({
         success: function() {
-          self.render()
+          self.render();
         }
       });
       this.songs = songs;

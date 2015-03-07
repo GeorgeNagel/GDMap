@@ -25,6 +25,10 @@ def recording(show_id):
     return render_template('base.html')
 
 
+def _album_for_show_id(show_id):
+    return
+
+
 @app.route('/recordings/', defaults={'query': None})
 @app.route('/recordings/<query>')
 def recordings(query):

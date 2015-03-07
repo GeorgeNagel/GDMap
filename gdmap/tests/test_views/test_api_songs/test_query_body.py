@@ -40,6 +40,7 @@ class BuildQueryBodyTestCase(TestCase):
                 'aggregations': {
                     'recordings': {
                         'aggregations': {
+                            'recordings_hits': {'top_hits': {'size': 1}},
                             'top_hit_date': {'avg': {'field': 'date'}},
                             'top_hit_score': {'max': {'script': '_score'}}
                         },

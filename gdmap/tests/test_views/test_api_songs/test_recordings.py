@@ -60,10 +60,28 @@ class SongsAPITestCase(APITestCase):
             json.loads(response.data),
             {
                 u'recordings': [
-                    {u'show_id': u'test_show_id_3', u'total': 1},
-                    {u'show_id': u'test_show_id_1', u'total': 1},
-                    {u'show_id': u'test_show_id_2', u'total': 1}
+                    {
+                        u'album': u'test album 2',
+                        u'date': u'1990-01-01',
+                        u'location': u'Bingo, NY',
+                        u'show_id': u'test_show_id_3',
+                        u'total': 1
+                    },
+                    {
+                        u'album': u'test album 1',
+                        u'date': u'1980-01-02',
+                        u'location': u'New York, NY',
+                        u'show_id': u'test_show_id_1',
+                        u'total': 1
+                    },
+                    {
+                        u'album': u'test album 1',
+                        u'date': u'1980-01-02',
+                        u'location': u'New York, NY',
+                        u'show_id': u'test_show_id_2',
+                        u'total': 1
+                    }
                 ],
-                'total': 3
+                u'total': 3
             }
         )
