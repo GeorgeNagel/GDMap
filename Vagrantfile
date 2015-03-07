@@ -8,6 +8,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "hashicorp/precise32"
 
+  # Allocate memory for the box
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+  end
+
   # Forward ssh
   config.vm.network :forwarded_port, id: "ssh", guest:22, host: 2000
   # Forward mongodb
