@@ -34,7 +34,7 @@ def _build_query_body(args):
     if args.get('q'):
         multi_field_query = _build_multi_field_query(args.get('q'))
     # Get targeted query bodies
-    fields = ['sha1', 'show_id', 'filename', 'title', 'location', 'track']
+    fields = ['sha1', 'filename', 'title', 'location', 'track']
     for field in fields:
         if args.get(field):
             phrase = args.get(field)
@@ -50,7 +50,11 @@ def _build_query_body(args):
     album = args.get('album')
     album_filter_body = _build_album_filter(album)
 
-    filter_body = _build_filter(date_filter_body, album_filter_body)
+    # Get show_id filter
+    show_id = args.get('show_id')
+    show_id_filter_body = _build_show_id_filter(show_id)
+
+    filter_body = _build_filter(date_filter_body, album_filter_body, show_id_filter_body)
 
     terms_query = None
     if multi_field_query and field_queries:
@@ -178,14 +182,13 @@ def _aggregation_sort(sort_field, sort_order):
         return {'top_hit_date': sort_order}
 
 
-def _build_filter(date_filter_body, album_filter_body):
-    if date_filter_body and album_filter_body:
-        filter_body = {"and": [date_filter_body, album_filter_body]}
+def _build_filter(date_filter_body, album_filter_body, show_id_filter_body):
+    sub_filters = [filt for filt in [date_filter_body, album_filter_body, show_id_filter_body] if filt]
+    if len(sub_filters) > 1:
+        filter_body = {"and": sub_filters}
         return filter_body
-    elif date_filter_body:
-        return date_filter_body
-    elif album_filter_body:
-        return album_filter_body
+    elif len(sub_filters) == 1:
+        return sub_filters[0]
     else:
         return None
 
@@ -205,3 +208,9 @@ def _build_album_filter(album):
     if not album:
         return None
     return {"term": {"album.raw": album}}
+
+
+def _build_show_id_filter(show_id):
+    if not show_id:
+        return None
+    return {"term": {"show_id": show_id}}
