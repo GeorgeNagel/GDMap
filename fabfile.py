@@ -68,3 +68,12 @@ def server():
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
             run('virtualenv/bin/python gdmap/run_server.py')
+
+
+@task
+@hosts([host])
+def find_locations():
+    """Generate the list of locations."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python scripts/find_locations.py')
