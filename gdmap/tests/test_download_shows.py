@@ -4,7 +4,7 @@ import unittest
 
 from mock import Mock, patch
 
-from gdmap.archive_api.download_shows import download_shows
+from gdmap.data_scraping.archive_api.download_shows import download_shows
 from gdmap.settings import TEST_FIXTURES_DIR
 
 
@@ -26,7 +26,7 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('gdmap.archive_api.utils.requests.get') as get_mock:
+        with patch('gdmap.data_scraping.utils.requests.get') as get_mock:
             get_mock.return_value = mock_response
 
             docs = download_shows(stop=1)

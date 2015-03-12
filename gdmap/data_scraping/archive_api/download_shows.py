@@ -3,7 +3,7 @@ import os
 import sys
 import time
 
-from gdmap.archive_api.utils import cache, internetarchive_json_api, APIException
+from gdmap.data_scraping.utils import cache, json_request, APIException
 
 logging.basicConfig(level=logging.INFO)
 
@@ -33,7 +33,7 @@ def download_shows(collection='GratefulDead',
         try:
             cached = cache.has_url(url)
             # Get the search api response
-            response_dict = internetarchive_json_api(url)
+            response_dict = json_request(url)
             # Add the returned documents to the ongoing list
             requested_docs = response_dict['response']['docs']
             if not requested_docs:

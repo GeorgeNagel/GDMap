@@ -6,8 +6,8 @@ import time
 
 from mongoengine import connect
 
-from gdmap.archive_api.utils import cache, internetarchive_json_api, APIException
-from gdmap.archive_api.download_shows import show_identifiers
+from gdmap.data_scraping.utils import cache, json_request, APIException
+from gdmap.data_scraping.archive_api.download_shows import show_identifiers
 from gdmap.models import Song
 from gdmap.settings import MONGO_DATABASE_NAME, logging
 
@@ -84,7 +84,7 @@ def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
         url = "%s/%s&output=json" % (base_url, id_)
         cached = cache.has_url(url)
         try:
-            response_dict = internetarchive_json_api(url)
+            response_dict = json_request(url)
             songs = songs_from_details(response_dict)
             for song in songs:
                 song.save()

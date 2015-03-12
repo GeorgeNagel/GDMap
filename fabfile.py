@@ -76,4 +76,4 @@ def find_locations():
     """Generate the list of locations."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python scripts/find_locations.py')
+            run('virtualenv/bin/python gdmap/data_scraping/dead_net/crawl_show_listings.py')
