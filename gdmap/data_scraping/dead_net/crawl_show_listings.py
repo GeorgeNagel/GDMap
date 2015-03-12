@@ -24,8 +24,11 @@ def parse_show_page(response):
     location_el = h4_els[1]
     location = location_el.string
 
-    next_page_el = soup.select('div.nextshow a')[0]
-    next_page_url = next_page_el.get('href')
+    next_page_url = None
+    next_page_anchors = soup.select('div.nextshow a')
+    if next_page_anchors:
+        next_page_el = next_page_anchors[0]
+        next_page_url = next_page_el.get('href')
 
     return {"date": date, "location": location, "venue": venue, "next": next_page_url}
 
@@ -42,8 +45,12 @@ def crawl_show_listings():
         logging.info("Response %d Cached? %s" % (status, cached))
         if status == 200:
             parsed_result = parse_show_page(response)
-            next_url = base_url + parsed_result.pop('next')
+            next_url_relative = parsed_result.pop('next')
             results.append(parsed_result)
+            if next_url_relative:
+                next_url = base_url + next_url_relative
+            else:
+                next_url = None
     return results
 
 
@@ -61,4 +68,4 @@ if __name__ == "__main__":
     unique_locations = unique_show_locations(listings)
     with open('locations.txt', 'w') as fout:
         for location in unique_locations:
-            fout.write("%s\n" % location)
+            fout.write("%s\n" % location.encode('utf-8'))

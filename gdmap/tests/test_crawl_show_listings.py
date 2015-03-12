@@ -45,3 +45,16 @@ class ParseShowPageTestCase(unittest.TestCase):
                 'venue': u"P.N.E. Garden Auditorium"
             }
         )
+
+    def test_no_next_page(self):
+        mock_response = self._mock_response_from_fixture('dead_net_february_24_1968.html')
+        parsed_page_info = parse_show_page(mock_response)
+        self.assertEqual(
+            parsed_page_info,
+            {
+                'date': u'February 24, 1968',
+                'location': u'Lake Tahoe, CA US',
+                'next': None,
+                'venue': u"King's Beach Bowl"
+            }
+        )
