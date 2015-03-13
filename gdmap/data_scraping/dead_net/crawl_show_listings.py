@@ -66,6 +66,6 @@ def unique_show_locations(listings):
 if __name__ == "__main__":
     listings = crawl_show_listings()
     unique_locations = unique_show_locations(listings)
-    with open('locations.txt', 'w') as fout:
+    with open('data/locations.txt', 'w') as fout:
         for location in unique_locations:
             fout.write("%s\n" % location.encode('utf-8'))

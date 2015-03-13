@@ -72,8 +72,17 @@ def server():
 
 @task
 @hosts([host])
-def find_locations():
+def crawl_show_listings():
     """Generate the list of locations."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
             run('virtualenv/bin/python gdmap/data_scraping/dead_net/crawl_show_listings.py')
+
+
+@task
+@hosts([host])
+def geocode_locations():
+    """Geocode the list of locations."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/data_scraping/geocode.py')
