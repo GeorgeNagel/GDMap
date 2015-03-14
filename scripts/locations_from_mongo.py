@@ -17,7 +17,7 @@ def find_locations():
 
 if __name__ == "__main__":
     locations = find_locations()
-    with open('locations.txt', 'w') as fout:
+    with open('data/locations_from_mongo.txt', 'w') as fout:
         for location in locations:
             # Must encode unicode before writing to file
             location = location.encode('utf-8')

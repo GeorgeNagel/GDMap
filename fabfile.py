@@ -72,6 +72,15 @@ def server():
 
 @task
 @hosts([host])
+def locations_from_mongo():
+    """Generate a list of locations from songs in mongo."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python scripts/locations_from_mongo.py')
+
+
+@task
+@hosts([host])
 def crawl_show_listings():
     """Generate the list of locations."""
     with cd('gdmap'):
