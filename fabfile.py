@@ -86,3 +86,12 @@ def geocode_locations():
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
             run('virtualenv/bin/python gdmap/data_scraping/geocode.py')
+
+
+@task
+@hosts([host])
+def geocode_listings():
+    """Geocode the listings from dead.net."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/data_scraping/geocode_show_listings.py')
