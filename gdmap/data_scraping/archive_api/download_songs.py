@@ -6,6 +6,7 @@ import time
 
 from mongoengine import connect
 
+from gdmap.data_scraping.geocode_show_listings import geocoding_dict
 from gdmap.data_scraping.utils import cache, json_request, APIException
 from gdmap.data_scraping.archive_api.download_shows import show_identifiers
 from gdmap.models import Song
@@ -20,6 +21,9 @@ base_url = 'https://archive.org/details'
 
 # Establish the connection to the database
 connect(MONGO_DATABASE_NAME)
+
+# A mapping of dates to venues to latitudes and longitudes
+geo_dict = geocoding_dict()
 
 
 def songs_from_details(details_dict):
@@ -42,6 +46,8 @@ def songs_from_details(details_dict):
     location = ""
     if 'coverage' in details_dict['metadata']:
         location = details_dict['metadata']['coverage'][0]
+
+    lat, lon = _concert_lat_lon(geo_dict, show_date_text, venue)
 
     songs = []
     for file_ in details_dict['files']:
@@ -66,7 +72,9 @@ def songs_from_details(details_dict):
                         'track': int(file_dict['track']),
                         'date': show_date_text,
                         'location': location,
-                        'venue': venue
+                        'venue': venue,
+                        'lat': lat,
+                        'lon': lon
                     }
                     song = Song(**song_data)
                     log.debug("Song data: %s" % song_data)
@@ -74,6 +82,45 @@ def songs_from_details(details_dict):
         except KeyError as e:
             log.warning("Bad data in %s%s: %s" % (show_id, file_, e))
     return songs
+
+
+def _concert_lat_lon(geocoding_dict, date_iso, venue):
+    """
+    Get the lat and lon for a concert, given a date and venue.
+    venue may be None.
+    """
+    possible_venues = geocoding_dict[date_iso].keys()
+    if len(possible_venues) > 1:
+        # We weren't given a venue on a date with multiple venues.
+        # We won't be able to geocode.
+        if not venue:
+            return None, None
+        # Check the edit distance between the given venue and possible venues
+        # To select the most likely match
+        best_match_venue = min(possible_venues, key=lambda x: _levenshtein(x, venue))
+
+    else:
+        best_match_venue = possible_venues[0]
+    lat = geocoding_dict[date_iso][best_match_venue]['lat']
+    lon = geocoding_dict[date_iso][best_match_venue]['lon']
+    return lat, lon
+
+
+def _levenshtein(seq1, seq2):
+    """
+    Calculate the edit distance between two sequences.
+    http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
+    """
+    oneago = None
+    thisrow = range(1, len(seq2) + 1) + [0]
+    for x in xrange(len(seq1)):
+        twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]  # noqa
+        for y in xrange(len(seq2)):
+            delcost = oneago[y] + 1
+            addcost = thisrow[y - 1] + 1
+            subcost = oneago[y - 1] + (seq1[x] != seq2[y])
+            thisrow[y] = min(delcost, addcost, subcost)
+    return thisrow[len(seq2) - 1]
 
 
 def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):

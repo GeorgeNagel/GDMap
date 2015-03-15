@@ -4,7 +4,7 @@ import unittest
 
 from mock import Mock, patch
 
-from gdmap.data_scraping.archive_api.download_songs import download_songs
+from gdmap.data_scraping.archive_api.download_songs import download_songs, _concert_lat_lon
 from gdmap.models import Song
 from gdmap.settings import TEST_FIXTURES_DIR
 from gdmap.tests.utils import mongo_clean
@@ -57,7 +57,9 @@ class TestDownloadSongs(unittest.TestCase):
                         'venue': 'Deer Creek Music Center',
                         "album": "1990-07-18 - Deer Creek Music Center",
                         "title": "Help On The Way",
-                        "track": 1
+                        "track": 1,
+                        'lat': 40.0455917,
+                        'lon': -86.0085955
                     }
                 )
 
@@ -101,7 +103,9 @@ class TestDownloadSongs(unittest.TestCase):
                         "title": "// Uncle John's Band >",
                         "venue": "",
                         "location": "",
-                        "track": 1
+                        "track": 1,
+                        'lat': 44.0520691,
+                        'lon': -123.0867536
                     }
                 )
 
@@ -127,3 +131,20 @@ class TestDownloadSongs(unittest.TestCase):
                 download_songs()
 
                 self.assertEqual(Song.objects.count(), 0)
+
+
+class TestConcertLatLon(unittest.TestCase):
+    def test_concert_lat_lon(self):
+        geocoding_dict = {
+            '1990-01-01': {
+                'Brixton Academy': {'lat': 5.0, 'lon': 6.1},
+                'Alley Palley': {'lat': -1.4, 'lon': 12.5}
+            }
+        }
+        lat, lon = _concert_lat_lon(geocoding_dict, '1990-01-01', 'Academy')
+        self.assertEqual(lat, 5.0)
+        self.assertEqual(lon, 6.1)
+
+        lat, lon = _concert_lat_lon(geocoding_dict, '1990-01-01', 'alley pal')
+        self.assertEqual(lat, -1.4)
+        self.assertEqual(lon, 12.5)
