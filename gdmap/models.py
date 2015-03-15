@@ -33,9 +33,6 @@ class Song(Document):
         help_text="Concert venue")
     location = fields.StringField(
         help_text="Location of the concert, usually city, state.")
-    lat = fields.FloatField(
-        help_text="Latitude of the concert.",
-        required=True)
-    lon = fields.FloatField(
-        help_text="Longitude of the concert.",
+    latlon = fields.StringField(
+        help_text="Comma-separated latitude and longitude of the concert.",
         required=True)

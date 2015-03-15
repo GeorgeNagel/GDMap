@@ -58,8 +58,7 @@ class TestDownloadSongs(unittest.TestCase):
                         "album": "1990-07-18 - Deer Creek Music Center",
                         "title": "Help On The Way",
                         "track": 1,
-                        'lat': 40.0455917,
-                        'lon': -86.0085955
+                        'latlon': "40.0455917,-86.0085955"
                     }
                 )
 
@@ -104,8 +103,7 @@ class TestDownloadSongs(unittest.TestCase):
                         "venue": "",
                         "location": "",
                         "track": 1,
-                        'lat': 44.0520691,
-                        'lon': -123.0867536
+                        'latlon': "44.0520691,-123.0867536"
                     }
                 )
 

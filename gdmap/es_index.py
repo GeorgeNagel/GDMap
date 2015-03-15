@@ -33,7 +33,10 @@ SONG_MAPPINGS = {
                 "title": {"type": "string", "index": "analyzed"},
                 "track": {"type": "integer"},
                 # Let Elasticsearch take care of the date mapping for us
-                "location": {"type": "string", "index": "analyzed"}
+                "location": {"type": "string", "index": "analyzed"},
+                "venue": {"type": "string", "index": "analyzed"},
+                "latlon": {"type": "geo_point", "lat_lon": True}
+
             }
         }
     }

@@ -73,8 +73,7 @@ def songs_from_details(details_dict):
                         'date': show_date_text,
                         'location': location,
                         'venue': venue,
-                        'lat': lat,
-                        'lon': lon
+                        'latlon': "%s,%s" % (lat, lon)
                     }
                     song = Song(**song_data)
                     log.debug("Song data: %s" % song_data)
@@ -147,4 +146,5 @@ def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
 
 if __name__ == '__main__':
     crawl_delay_seconds = int(sys.argv[1])
+    Song.objects.delete()
     download_songs(crawl_delay_seconds=crawl_delay_seconds)
