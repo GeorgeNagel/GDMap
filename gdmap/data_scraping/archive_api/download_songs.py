@@ -35,10 +35,13 @@ def songs_from_details(details_dict):
         log.warning("Invalid date: %s" % e)
         return []
 
-    # Sometimes show location is not available on an item level
-    show_location = None
+    # Sometimes show location is not available on the item level
+    venue = ""
+    if 'venue' in details_dict['metadata']:
+        venue = details_dict['metadata']['venue'][0]
+    location = ""
     if 'coverage' in details_dict['metadata']:
-        show_location = details_dict['metadata']['coverage'][0]
+        location = details_dict['metadata']['coverage'][0]
 
     songs = []
     for file_ in details_dict['files']:
@@ -54,10 +57,6 @@ def songs_from_details(details_dict):
                     # We only care about one set of files, so just
                     # index the original files
                     album = file_dict['album']
-                    if not show_location:
-                        # There was no item-wide location info
-                        # album is in the format of "1984-05-06 - Silva Hall at the Hult Center"
-                        show_location = album.split('-')[-1].strip()
                     song_data = {
                         'show_id': show_id,
                         'filename': file_.strip('/'),
@@ -66,7 +65,8 @@ def songs_from_details(details_dict):
                         'title': file_dict['title'],
                         'track': int(file_dict['track']),
                         'date': show_date_text,
-                        'location': show_location
+                        'location': location,
+                        'venue': venue
                     }
                     song = Song(**song_data)
                     log.debug("Song data: %s" % song_data)

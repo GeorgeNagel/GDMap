@@ -11,4 +11,6 @@ FLASK_DEBUG = False
 
 ELASTICSEARCH_INDEX_NAME = 'gdmap'
 
+DATA_DIR = '/home/vagrant/gdmap/data'
+
 logging.basicConfig(level=logging.INFO)

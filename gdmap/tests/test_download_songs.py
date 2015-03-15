@@ -10,7 +10,7 @@ from gdmap.settings import TEST_FIXTURES_DIR
 from gdmap.tests.utils import mongo_clean
 
 
-class TestDownloadShows(unittest.TestCase):
+class TestDownloadSongs(unittest.TestCase):
     def _mock_json(self, json_fixture_path):
         """A mock json() response method."""
         # Load the response fixture
@@ -54,6 +54,7 @@ class TestDownloadShows(unittest.TestCase):
                         # Embedded document representation of datetime
                         'date': '1990-07-18',
                         'location': 'Noblesville, IN',
+                        'venue': 'Deer Creek Music Center',
                         "album": "1990-07-18 - Deer Creek Music Center",
                         "title": "Help On The Way",
                         "track": 1
@@ -96,9 +97,10 @@ class TestDownloadShows(unittest.TestCase):
                         "filename": "gd1984-05-06set2d1t01.flac",
                         # Embedded document representation of datetime
                         'date': '1984-05-06',
-                        'location': 'Silva Hall at the Hult Center',
                         "album": "1984-05-06 - Silva Hall at the Hult Center",
                         "title": "// Uncle John's Band >",
+                        "venue": "",
+                        "location": "",
                         "track": 1
                     }
                 )
