@@ -1,8 +1,10 @@
 define([
   'backbone',
   'collections/RecordingsCollection',
-  'views/RecordingResultView'
-], function(Backbone, RecordingsCollection, RecordingResultView){
+  'views/RecordingResultView',
+  'views/MapView',
+  'utils',
+], function(Backbone, RecordingsCollection, RecordingResultView, MapView, utils){
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
@@ -18,7 +20,14 @@ define([
     },
     render: function(){
       var self = this;
-      self.$el.html("<h1>Recordings</h1>")
+      self.$el.html("<h1>Recordings</h1>");
+
+      // Render the map
+      var latlons = utils.modelsLatLons(self.recordings.models);
+      var mapview = new MapView(null, {latlons: latlons});
+      mapview.render();
+
+      // Render the recordings list
       self.recordings.each(function(recording) {
         var view = new RecordingResultView(recording);
         self.$el.append(view.render());

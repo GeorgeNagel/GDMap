@@ -3,8 +3,9 @@ define([
   'backbone',
   'collections/SongsByShowCollection',
   'views/SongView',
-  'views/MapView'
-], function($, Backbone, SongsByShowCollection, SongView, MapView){
+  'views/MapView',
+  'utils',
+], function($, Backbone, SongsByShowCollection, SongView, MapView, utils){
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
@@ -21,15 +22,15 @@ define([
     },
     render: function(){
       var self = this;
-      // Generate the list of lat-lons for the MapView to consume
-      var latlons = [];
-      $.each(self.songs.models, function(index, song) {
-        var latlon = song.attributes.latlon.split(',');
-        latlons.push(latlon);
-      });
+
       self.$el.html("<h1>Search</h1>");
+
+      // Render the map
+      var latlons = utils.modelsLatLons(self.songs.models);
       var mapview = new MapView(null, {latlons: latlons});
       mapview.render();
+
+      // Render the songs list
       self.songs.each(function(song) {
         var view = new SongView(song, self.options);
         self.$el.append(view.render());
