@@ -21,7 +21,7 @@ define([
     render: function(){
       var self = this;
       self.$el.html("<h1>Search</h1>");
-      var mapview = new MapView();
+      var mapview = new MapView(null, {songs: self.songs});
       mapview.render();
       self.songs.each(function(song) {
         var view = new SongView(song, self.options);
