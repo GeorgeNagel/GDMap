@@ -7,19 +7,18 @@ define([
   return Backbone.View.extend({
     el: $("#map-canvas"),
     initialize: function(model, options) {
-        this.songs = options.songs.models;
+        this.latlons = options.latlons;
     },
     render: function(){
       var self = this;
-      var myLatlng = new google.maps.LatLng(40,-80);
+      var centerLatlng = new google.maps.LatLng(41,-98);
       var mapOptions = {
-        zoom: 4,
-        center: myLatlng
+        zoom: 3,
+        center: centerLatlng
       }
       var map = new google.maps.Map(this.el, mapOptions);
 
-      $.each(this.songs, function(index, song) {
-        var latlon = song.attributes.latlon.split(',');
+      $.each(this.latlons, function(index, latlon) {
         var position = new google.maps.LatLng(latlon[0], latlon[1]);
         var marker = new google.maps.Marker({
             position: position,
