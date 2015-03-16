@@ -29,7 +29,7 @@ def clean():
 def download_shows(crawl_delay=1):
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/archive_api/download_shows.py %s' % crawl_delay)
+            run('virtualenv/bin/python gdmap/data_scraping/archive_api/download_shows.py %s' % crawl_delay)
 
 
 @task
@@ -37,7 +37,7 @@ def download_shows(crawl_delay=1):
 def download_songs(crawl_delay=1):
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/archive_api/download_songs.py %s' % crawl_delay)
+            run('virtualenv/bin/python gdmap/data_scraping/archive_api/download_songs.py %s' % crawl_delay)
 
 
 @task
@@ -68,3 +68,39 @@ def server():
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
             run('virtualenv/bin/python gdmap/run_server.py')
+
+
+@task
+@hosts([host])
+def locations_from_mongo():
+    """Generate a list of locations from songs in mongo."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python scripts/locations_from_mongo.py')
+
+
+@task
+@hosts([host])
+def crawl_show_listings():
+    """Generate the list of locations."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/data_scraping/dead_net/crawl_show_listings.py')
+
+
+@task
+@hosts([host])
+def geocode_locations():
+    """Geocode the list of locations."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/data_scraping/geocode.py')
+
+
+@task
+@hosts([host])
+def geocode_listings():
+    """Geocode the listings from dead.net."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('virtualenv/bin/python gdmap/data_scraping/geocode_show_listings.py')

@@ -29,6 +29,10 @@ class Song(Document):
     date = fields.StringField(
         help_text="Date of the concert, yyyy-mm-dd.",
         required=True)
+    venue = fields.StringField(
+        help_text="Concert venue")
     location = fields.StringField(
-        help_text="Location of the concert.",
+        help_text="Location of the concert, usually city, state.")
+    latlon = fields.StringField(
+        help_text="Comma-separated latitude and longitude of the concert.",
         required=True)

@@ -2,8 +2,10 @@ define([
   'backbone',
   'mustache',
   'collections/RecordingsCollection',
-  'text!templates/recording.mustache'
-], function(Backbone, Mustache, RecordingsCollection, recordingtemplate){
+  'text!templates/recording.mustache',
+  'views/MapView',
+  'utils',
+], function(Backbone, Mustache, RecordingsCollection, recordingtemplate, MapView, utils){
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
@@ -24,6 +26,11 @@ define([
       this.$el.html("<h1>Recording</h1>");
       var recording = this.recordings.first();
       if (recording) {
+        // Render the map
+        var latlons = utils.modelsLatLons([recording]);
+        var mapview = new MapView(null, {latlons: latlons});
+        mapview.render();
+        // Render the recording
         var rendered = Mustache.render(recordingtemplate, recording.attributes);
         this.$el.append(rendered);
       }

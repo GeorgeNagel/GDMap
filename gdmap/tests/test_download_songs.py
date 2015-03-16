@@ -4,13 +4,13 @@ import unittest
 
 from mock import Mock, patch
 
-from gdmap.archive_api.download_songs import download_songs
+from gdmap.data_scraping.archive_api.download_songs import download_songs, _concert_lat_lon
 from gdmap.models import Song
 from gdmap.settings import TEST_FIXTURES_DIR
 from gdmap.tests.utils import mongo_clean
 
 
-class TestDownloadShows(unittest.TestCase):
+class TestDownloadSongs(unittest.TestCase):
     def _mock_json(self, json_fixture_path):
         """A mock json() response method."""
         # Load the response fixture
@@ -30,9 +30,9 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('gdmap.archive_api.utils.requests.get') as get_mock:
+        with patch('gdmap.data_scraping.utils.requests.get') as get_mock:
             # Patch show_identifiers() to return an id without making calls
-            with patch('gdmap.archive_api.download_songs.show_identifiers') as ids_mock:
+            with patch('gdmap.data_scraping.archive_api.download_songs.show_identifiers') as ids_mock:
                 ids_mock.return_value = ['abc123']
                 get_mock.return_value = mock_response
 
@@ -54,9 +54,11 @@ class TestDownloadShows(unittest.TestCase):
                         # Embedded document representation of datetime
                         'date': '1990-07-18',
                         'location': 'Noblesville, IN',
+                        'venue': 'Deer Creek Music Center',
                         "album": "1990-07-18 - Deer Creek Music Center",
                         "title": "Help On The Way",
-                        "track": 1
+                        "track": 1,
+                        'latlon': "40.0455917,-86.0085955"
                     }
                 )
 
@@ -73,9 +75,9 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('gdmap.archive_api.utils.requests.get') as get_mock:
+        with patch('gdmap.data_scraping.utils.requests.get') as get_mock:
             # Patch show_identifiers() to return an id without making calls
-            with patch('gdmap.archive_api.download_songs.show_identifiers') as ids_mock:
+            with patch('gdmap.data_scraping.archive_api.download_songs.show_identifiers') as ids_mock:
                 ids_mock.return_value = ['abc123']
                 get_mock.return_value = mock_response
 
@@ -96,10 +98,12 @@ class TestDownloadShows(unittest.TestCase):
                         "filename": "gd1984-05-06set2d1t01.flac",
                         # Embedded document representation of datetime
                         'date': '1984-05-06',
-                        'location': 'Silva Hall at the Hult Center',
                         "album": "1984-05-06 - Silva Hall at the Hult Center",
                         "title": "// Uncle John's Band >",
-                        "track": 1
+                        "venue": "",
+                        "location": "",
+                        "track": 1,
+                        'latlon': "44.0520691,-123.0867536"
                     }
                 )
 
@@ -116,12 +120,29 @@ class TestDownloadShows(unittest.TestCase):
         }
         mock_response.configure_mock(**mock_attrs)
         # Patch the request to return the mocked response
-        with patch('gdmap.archive_api.utils.requests.get') as get_mock:
+        with patch('gdmap.data_scraping.utils.requests.get') as get_mock:
             # Patch show_identifiers() to return an id without making calls
-            with patch('gdmap.archive_api.download_songs.show_identifiers') as ids_mock:
+            with patch('gdmap.data_scraping.archive_api.download_songs.show_identifiers') as ids_mock:
                 ids_mock.return_value = ['abc123']
                 get_mock.return_value = mock_response
 
                 download_songs()
 
                 self.assertEqual(Song.objects.count(), 0)
+
+
+class TestConcertLatLon(unittest.TestCase):
+    def test_concert_lat_lon(self):
+        geocoding_dict = {
+            '1990-01-01': {
+                'Brixton Academy': {'lat': 5.0, 'lon': 6.1},
+                'Alley Palley': {'lat': -1.4, 'lon': 12.5}
+            }
+        }
+        lat, lon = _concert_lat_lon(geocoding_dict, '1990-01-01', 'Academy')
+        self.assertEqual(lat, 5.0)
+        self.assertEqual(lon, 6.1)
+
+        lat, lon = _concert_lat_lon(geocoding_dict, '1990-01-01', 'alley pal')
+        self.assertEqual(lat, -1.4)
+        self.assertEqual(lon, 12.5)
