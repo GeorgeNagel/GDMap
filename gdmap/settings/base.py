@@ -3,8 +3,7 @@ import logging
 MONGO_DATABASE_NAME = 'gdmap'
 MONGO_CACHE_NAME = 'cache'
 
-# 1 month cache expiration
-CACHE_EXPIRATION_SECONDS = 60 * 60 * 24 * 30
+CACHE_EXPIRATION_SECONDS = None
 
 # Show flask debugging output
 FLASK_DEBUG = False

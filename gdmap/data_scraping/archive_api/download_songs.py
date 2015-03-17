@@ -88,6 +88,9 @@ def _concert_lat_lon(geocoding_dict, date_iso, venue):
     Get the lat and lon for a concert, given a date and venue.
     venue may be None.
     """
+    if date_iso not in geocoding_dict:
+        log.warning("Unable to geocode concert on date: %s" % date_iso)
+        return None, None
     possible_venues = geocoding_dict[date_iso].keys()
     if len(possible_venues) > 1:
         # We weren't given a venue on a date with multiple venues.

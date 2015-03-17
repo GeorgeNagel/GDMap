@@ -109,8 +109,8 @@ class TestDownloadSongs(unittest.TestCase):
 
     @mongo_clean
     def test_invalid_date(self):
-        self.maxDiff = None
         """Test creating songs from a details response with no coverage field."""
+        self.maxDiff = None
         # Mock the response
         mock_response = Mock()
         json_fixture_path = os.path.join(TEST_FIXTURES_DIR, 'gd_details_response_invalid_date.json')
@@ -130,19 +130,49 @@ class TestDownloadSongs(unittest.TestCase):
 
                 self.assertEqual(Song.objects.count(), 0)
 
+    @mongo_clean
+    def test_uknown_date(self):
+        """Test downloading a song with a date not found on dead.net."""
+        self.maxDiff = None
+        # Mock the response
+        mock_response = Mock()
+        json_fixture_path = os.path.join(TEST_FIXTURES_DIR, 'gd_details_response_unknown_date.json')
+        mock_attrs = {
+            'json.return_value': self._mock_json(json_fixture_path),
+            'status_code': 200
+        }
+        mock_response.configure_mock(**mock_attrs)
+        # Patch the request to return the mocked response
+        with patch('gdmap.data_scraping.utils.requests.get') as get_mock:
+            # Patch show_identifiers() to return an id without making calls
+            with patch('gdmap.data_scraping.archive_api.download_songs.show_identifiers') as ids_mock:
+                ids_mock.return_value = ['abc123']
+                get_mock.return_value = mock_response
+
+                download_songs()
+
+                self.assertEqual(Song.objects.count(), 0)
+
 
 class TestConcertLatLon(unittest.TestCase):
-    def test_concert_lat_lon(self):
-        geocoding_dict = {
+    def setUp(self):
+        self.geocoding_dict = {
             '1990-01-01': {
                 'Brixton Academy': {'lat': 5.0, 'lon': 6.1},
                 'Alley Palley': {'lat': -1.4, 'lon': 12.5}
             }
         }
-        lat, lon = _concert_lat_lon(geocoding_dict, '1990-01-01', 'Academy')
+
+    def test_concert_lat_lon(self):
+        lat, lon = _concert_lat_lon(self.geocoding_dict, '1990-01-01', 'Academy')
         self.assertEqual(lat, 5.0)
         self.assertEqual(lon, 6.1)
 
-        lat, lon = _concert_lat_lon(geocoding_dict, '1990-01-01', 'alley pal')
+        lat, lon = _concert_lat_lon(self.geocoding_dict, '1990-01-01', 'alley pal')
         self.assertEqual(lat, -1.4)
         self.assertEqual(lon, 12.5)
+
+    def test_unknown_date(self):
+        lat, lon = _concert_lat_lon(self.geocoding_dict, '1990-05-06', 'alley pal')
+        self.assertEqual(lat, None)
+        self.assertEqual(lon, None)
