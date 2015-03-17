@@ -60,24 +60,37 @@ def download_shows(collection='GratefulDead',
     # Write the csv file
     with open(SHOWS_FILENAME, 'w') as fout:
         csvwriter = csv.writer(fout)
-        csvwriter.writerow(['show_id', 'date'])
+        csvwriter.writerow(['identifier', 'date'])
         for doc in docs:
             # Some recordings don't have a date in the search result
-            date = doc.get('date', '')
+            # Usually this is due to poorly formatted dates, like 1967-03-85
+            date = doc.get('date', 'no-date')
             identifier = doc['identifier']
             csvwriter.writerow([identifier, date])
 
 
-def show_identifiers():
-    """Return a list of internetarchive show ids."""
+def show_identifiers(year):
+    """Return a list of internetarchive show ids.
+    Year is a number like 1990 or string, like '1999',
+    or 'no-date' to match recordings that didn't provide a date.
+    """
+    # Cast any number years to strings
+    year = str(year)
+
     # Load whatever ids are currently stored in file
     if os.path.exists(SHOWS_FILENAME):
-        ids = []
+        shows = []
         with open(SHOWS_FILENAME, 'r') as fin:
-            for line in fin:
-                id_ = line.strip()
-                ids.append(id_)
-        return ids
+            csvreader = csv.DictReader(fin)
+            for show_dict in csvreader:
+                shows.append(show_dict)
+        if not year:
+            filtered_shows = [show for show in shows if not show['date']]
+        else:
+            filtered_shows = [show for show in shows if show['date'].startswith(year)]
+        show_ids = [show['identifier'] for show in filtered_shows]
+        return show_ids
+
     else:
         raise Exception("%s does not exist." % SHOWS_FILENAME)
 

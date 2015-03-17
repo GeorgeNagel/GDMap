@@ -10,7 +10,7 @@ from gdmap.data_scraping.geocode_show_listings import geocoding_dict
 from gdmap.data_scraping.utils import json_request, APIException
 from gdmap.data_scraping.archive_api.download_shows import show_identifiers
 from gdmap.models import Song
-from gdmap.settings import MONGO_DATABASE_NAME, logging
+from gdmap.settings import MONGO_DATABASE_NAME, DATA_DIRECTORY, logging
 
 
 log = logging.getLogger(__name__)
@@ -128,9 +128,9 @@ def _levenshtein(seq1, seq2):
     return thisrow[len(seq2) - 1]
 
 
-def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
-    """Download song information and save to mongo."""
-    show_ids = show_identifiers()
+def download_songs(year, crawl_delay_seconds=1, max_errors=10, **kwargs):
+    """Download song information for a given year and save to mongo."""
+    show_ids = show_identifiers(year)
     errors = 0
     for id_ in show_ids:
         url = "%s/%s&output=json" % (base_url, id_)
@@ -150,7 +150,24 @@ def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
             # Don't hit their api too hard too fast
             time.sleep(crawl_delay_seconds)
 
+
+def dump_songs_json(year):
+    """Dump all of the songs in a given year to a JSON file."""
+    songs_directory = os.path.join(DATA_DIRECTORY, 'songs')
+    if not os.path.exists(songs_directory):
+        os.makedirs(songs_directory)
+    songs_filename = os.path.join(songs_directory, "%s.jl" % year)
+    year_string = str(year)
+    next_year_string = str(year+1)
+    with open(songs_filename, 'w') as fout:
+        for song in Song.objects(date__gte=year_string, date__lt=next_year_string):
+            fout.write('%s\n' % song.to_json())
+
 if __name__ == '__main__':
     crawl_delay_seconds = int(sys.argv[1])
     Song.objects.delete()
-    download_songs(crawl_delay_seconds=crawl_delay_seconds)
+    years = range(1967, 1996)
+    for year in years:
+        print "Downloading songs for year: %s" % year
+        download_songs(year, crawl_delay_seconds=crawl_delay_seconds)
+        dump_songs_json(year)
