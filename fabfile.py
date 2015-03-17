@@ -26,6 +26,14 @@ def clean():
 
 @task
 @hosts([host])
+def restart_mongo():
+    """Restart the mongo service."""
+    run('sudo rm -f /var/lib/mongodb/mongod.lock')
+    run('sudo service mongodb restart')
+
+
+@task
+@hosts([host])
 def download_shows(crawl_delay=1):
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
