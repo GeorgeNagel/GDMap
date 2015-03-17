@@ -48,6 +48,9 @@ def songs_from_details(details_dict):
         location = details_dict['metadata']['coverage'][0]
 
     lat, lon = _concert_lat_lon(geo_dict, show_date_text, venue)
+    if lat is None or lon is None:
+        log.warning("Could not geocode: %s - %s." % (show_date_text, venue))
+        return []
 
     songs = []
     for file_ in details_dict['files']:
