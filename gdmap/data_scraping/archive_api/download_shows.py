@@ -1,9 +1,11 @@
+import csv
 import logging
 import os
 import sys
 import time
 
-from gdmap.data_scraping.utils import cache, json_request, APIException
+from gdmap.data_scraping.utils import json_request, APIException
+from gdmap.settings import DATA_DIRECTORY
 
 logging.basicConfig(level=logging.INFO)
 
@@ -13,7 +15,7 @@ per_page = 100
 crawl_delay_seconds = 1
 start = 0
 
-OUTPUT_FILENAME = "shows.txt"
+SHOWS_FILENAME = os.path.join(DATA_DIRECTORY, "shows.csv")
 
 
 def download_shows(collection='GratefulDead',
@@ -22,6 +24,7 @@ def download_shows(collection='GratefulDead',
                    crawl_delay_seconds=1,
                    max_errors=10,
                    stop=None):
+    """Download show ids and save them in a csv, along with their date."""
     docs = []
     errors = 0
     while True:
@@ -31,9 +34,8 @@ def download_shows(collection='GratefulDead',
         url = "%s?q=%s&output=json" % (base_url, query)
 
         try:
-            cached = cache.has_url(url)
             # Get the search api response
-            response_dict = json_request(url)
+            response_dict, cached = json_request(url)
             # Add the returned documents to the ongoing list
             requested_docs = response_dict['response']['docs']
             if not requested_docs:
@@ -54,31 +56,32 @@ def download_shows(collection='GratefulDead',
         # Exit after you have the item at index 'stop'
         if stop is not None and start >= stop:
             break
-    return docs
+
+    # Write the csv file
+    with open(SHOWS_FILENAME, 'w') as fout:
+        csvwriter = csv.writer(fout)
+        csvwriter.writerow(['show_id', 'date'])
+        for doc in docs:
+            # Some recordings don't have a date in the search result
+            date = doc.get('date', '')
+            identifier = doc['identifier']
+            csvwriter.writerow([identifier, date])
 
 
-def show_identifiers(from_file=False, **kwargs):
+def show_identifiers():
     """Return a list of internetarchive show ids."""
-    if from_file:
-        # Load whatever ids are currently stored in file
-        if os.path.exists(OUTPUT_FILENAME):
-            ids = []
-            with open(OUTPUT_FILENAME, 'r') as fin:
-                for line in fin:
-                    id_ = line.strip()
-                    ids.append(id_)
-            return ids
-        else:
-            raise Exception("%s does not exist." % OUTPUT_FILENAME)
-    else:
-        # Make the live requests
-        docs = download_shows(**kwargs)
-        ids = [doc['identifier'] for doc in docs]
+    # Load whatever ids are currently stored in file
+    if os.path.exists(SHOWS_FILENAME):
+        ids = []
+        with open(SHOWS_FILENAME, 'r') as fin:
+            for line in fin:
+                id_ = line.strip()
+                ids.append(id_)
         return ids
+    else:
+        raise Exception("%s does not exist." % SHOWS_FILENAME)
+
 
 if __name__ == '__main__':
     crawl_delay_seconds = int(sys.argv[1])
-    ids = show_identifiers(crawl_delay_seconds=crawl_delay_seconds)
-    with open(OUTPUT_FILENAME, 'w') as fout:
-        for id_ in ids:
-            fout.write("%s\n" % id_)
+    download_shows(crawl_delay_seconds=crawl_delay_seconds)

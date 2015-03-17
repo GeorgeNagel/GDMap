@@ -7,7 +7,7 @@ import time
 from mongoengine import connect
 
 from gdmap.data_scraping.geocode_show_listings import geocoding_dict
-from gdmap.data_scraping.utils import cache, json_request, APIException
+from gdmap.data_scraping.utils import json_request, APIException
 from gdmap.data_scraping.archive_api.download_shows import show_identifiers
 from gdmap.models import Song
 from gdmap.settings import MONGO_DATABASE_NAME, logging
@@ -130,13 +130,13 @@ def _levenshtein(seq1, seq2):
 
 def download_songs(crawl_delay_seconds=1, max_errors=10, **kwargs):
     """Download song information and save to mongo."""
-    show_ids = show_identifiers(from_file=True)
+    show_ids = show_identifiers()
     errors = 0
     for id_ in show_ids:
         url = "%s/%s&output=json" % (base_url, id_)
-        cached = cache.has_url(url)
+        cached = False
         try:
-            response_dict = json_request(url)
+            response_dict, cached = json_request(url)
             songs = songs_from_details(response_dict)
             for song in songs:
                 song.save()
