@@ -21,6 +21,9 @@ parser.add_argument('track', type=int)
 # Filter by album name (concert name)
 parser.add_argument('album', type=str)
 
+# Filter by recording
+parser.add_argument('show_id', type=str)
+
 # Results per page
 parser.add_argument('per_page', type=int)
 
