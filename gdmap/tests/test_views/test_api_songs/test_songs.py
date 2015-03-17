@@ -19,7 +19,8 @@ class SongsAPITestCase(APITestCase):
                                 title='test_title',
                                 track=1,
                                 date='1980-01-02',
-                                location='New York, NY')
+                                location='New York, NY',
+                                latlon='1,2')
 
         # A song from another show
         self.test_song_2 = Song(sha1='abc1232',
@@ -29,7 +30,8 @@ class SongsAPITestCase(APITestCase):
                                 title='test_title_2',
                                 track=2,
                                 date='1990-01-01',
-                                location='Bingo, NY')
+                                location='Bingo, NY',
+                                latlon='1,2')
         super(SongsAPITestCase, self).setUp()
 
     @mongo_clean
@@ -56,6 +58,7 @@ class SongsAPITestCase(APITestCase):
                         u'location': u'New York, NY',
                         u'show_id': u'test_show_id',
                         u'title': u'test_title',
+                        u'latlon': u'1,2',
                         u'track': 1
                     },
                 ],
@@ -92,6 +95,7 @@ class SongsAPITestCase(APITestCase):
                         u'location': u'Bingo, NY',
                         u'show_id': u'test_show_id_2',
                         u'title': u'test_title_2',
+                        u'latlon': u'1,2',
                         u'track': 2
                     },
                     {
@@ -101,6 +105,7 @@ class SongsAPITestCase(APITestCase):
                         u'location': u'New York, NY',
                         u'show_id': u'test_show_id',
                         u'title': u'test_title',
+                        u'latlon': u'1,2',
                         u'track': 1
                     }
                 ],
@@ -137,6 +142,7 @@ class SongsAPITestCase(APITestCase):
                         u'location': u'Bingo, NY',
                         u'show_id': u'test_show_id_2',
                         u'title': u'test_title_2',
+                        u'latlon': u'1,2',
                         u'track': 2
                     }
                 ],
@@ -173,6 +179,7 @@ class SongsAPITestCase(APITestCase):
                         u'location': u'Bingo, NY',
                         u'show_id': u'test_show_id_2',
                         u'title': u'test_title_2',
+                        u'latlon': u'1,2',
                         u'track': 2
                     }
                 ],

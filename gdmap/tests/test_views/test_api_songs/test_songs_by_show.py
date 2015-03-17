@@ -19,6 +19,7 @@ class SongsByShowAPITestCase(APITestCase):
                                 title='test_title',
                                 track=1,
                                 date='1980-01-02',
+                                latlon='1,2',
                                 location='New York, NY')
 
         # A song from another show
@@ -29,6 +30,7 @@ class SongsByShowAPITestCase(APITestCase):
                                 title='test_title_2',
                                 track=2,
                                 date='1990-01-01',
+                                latlon='1,2',
                                 location='Bingo, NY')
         super(SongsByShowAPITestCase, self).setUp()
 
@@ -59,6 +61,7 @@ class SongsByShowAPITestCase(APITestCase):
                                 u'location': u'New York, NY',
                                 u'show_id': u'test_show_id',
                                 u'title': u'test_title',
+                                u'latlon': u'1,2',
                                 u'track': 1
                             },
                         ],
@@ -97,6 +100,7 @@ class SongsByShowAPITestCase(APITestCase):
                                 u'location': u'Bingo, NY',
                                 u'show_id': u'test_show_id_2',
                                 u'title': u'test_title_2',
+                                u'latlon': u'1,2',
                                 u'track': 2
                             }
                         ],
@@ -112,6 +116,7 @@ class SongsByShowAPITestCase(APITestCase):
                                 u'location': u'New York, NY',
                                 u'show_id': u'test_show_id',
                                 u'title': u'test_title',
+                                u'latlon': u'1,2',
                                 u'track': 1
                             }
                         ],
@@ -152,6 +157,7 @@ class SongsByShowAPITestCase(APITestCase):
                                 u'location': u'New York, NY',
                                 u'show_id': u'test_show_id',
                                 u'title': u'test_title',
+                                u'latlon': u'1,2',
                                 u'track': 1
                             }
                         ],
