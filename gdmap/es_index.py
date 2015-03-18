@@ -57,8 +57,8 @@ def batch_index_songs(song_dicts):
     actions = [
         {
             '_id': song_dict['_id'],
-            '_index': 'song',
-            '_type': 'document',
+            '_index': ELASTICSEARCH_INDEX_NAME,
+            '_type': 'song',
             '_source': song_dict
         } for song_dict in song_dicts
     ]
