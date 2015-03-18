@@ -12,4 +12,4 @@ FLASK_DEBUG = False
 
 ELASTICSEARCH_INDEX_NAME = 'gdmap'
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
