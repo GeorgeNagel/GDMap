@@ -13,6 +13,7 @@ hostenv
 
 # Ignore text files
 *.txt
+*.csv
 
 # Local settings files
 gdmap/settings/local.py

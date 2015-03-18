@@ -31,6 +31,6 @@ def json_request(url):
     status = response.status_code
     logging.info("Response %d Cached? %s" % (status, cached))
     if status == 200:
-        return response_dict
+        return response_dict, cached
     else:
         raise APIException("Error (%d) downloading: %s" % (status, url))

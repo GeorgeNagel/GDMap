@@ -1,14 +1,14 @@
 import json
+import os
 
-from elasticsearch import Elasticsearch, ConnectionTimeout
+from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk
 
-from gdmap.models import Song
-from gdmap.settings import ELASTICSEARCH_INDEX_NAME, logging
+from gdmap.settings import ELASTICSEARCH_INDEX_NAME, DATA_DIRECTORY, logging
 
 log = logging.getLogger(__name__)
 
 es = Elasticsearch()
-doc_type = 'song'
 
 SONG_MAPPINGS = {
     "mappings": {
@@ -44,44 +44,45 @@ SONG_MAPPINGS = {
 
 
 def create_index():
-    es.indices.create(ELASTICSEARCH_INDEX_NAME, SONG_MAPPINGS)
-
-
-def index_song(song_document):
-    song_data = json.loads(song_document.to_json())
-    song_data.pop('_id')
-    index_attempts = 0
-    while index_attempts < 3:
-        try:
-            es.create(index=ELASTICSEARCH_INDEX_NAME,
-                      doc_type=doc_type,
-                      body=song_data,
-                      timeout=100)
-            # It worked without raising an exception
-            break
-        except ConnectionTimeout:
-            log.warning(
-                "Connection timeout. Retrying (%d)" % (index_attempts+1)
-            )
-            index_attempts += 1
-    log.debug(
-        'Indexed song: %s%s' % (
-            song_data['show_id'],
-            song_data['filename']
-        )
-    )
-
-
-def index_songs():
-    """Index all of the songs into elasticsearch from data in mongo."""
     # Delete the entire index
     if es.indices.exists(ELASTICSEARCH_INDEX_NAME):
         log.info("Removing index: %s" % ELASTICSEARCH_INDEX_NAME)
         # We use delete rather than flush in case the mapping has changed.
         es.indices.delete(ELASTICSEARCH_INDEX_NAME)
-    create_index()
-    for song in Song.objects:
-        index_song(song)
+    es.indices.create(ELASTICSEARCH_INDEX_NAME, SONG_MAPPINGS)
+
+
+def batch_index_songs(song_dicts):
+    # Create the iterable of index actions for consumption by bulk()
+    actions = [
+        {
+            '_id': song_dict['_id'],
+            '_index': ELASTICSEARCH_INDEX_NAME,
+            '_type': 'song',
+            '_source': song_dict
+        } for song_dict in song_dicts
+    ]
+    bulk(es, actions)
+    log.debug(
+        'Indexed song: %s%s' % (
+            song_dict['show_id'],
+            song_dict['filename']
+        )
+    )
+
+
+def index_songs(year):
+    """Index all of the songs into elasticsearch from data in .jl files."""
+    print "Indexing songs for year: %s" % year
+    songs_jl = os.path.join(DATA_DIRECTORY, 'songs/%s.jl' % year)
+    # Read the songs in from file
+    songs = []
+    with open(songs_jl, 'r') as fin:
+        for song in fin:
+            song_dict = json.loads(song)
+            songs.append(song_dict)
+    # Batch index the songs into Elasticsearch
+    batch_index_songs(songs)
 
 
 def query_es(query_body):
@@ -90,4 +91,7 @@ def query_es(query_body):
     return res
 
 if __name__ == "__main__":
-    index_songs()
+    create_index()
+    years = range(1967, 1996)
+    for year in years:
+        index_songs(year)
