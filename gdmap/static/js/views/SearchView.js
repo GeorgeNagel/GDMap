@@ -1,11 +1,15 @@
 define([
   'jquery',
   'backbone',
+  'mustache',
   'collections/SongsByShowCollection',
   'views/SongView',
   'views/MapView',
+  'text!templates/searchwidget.mustache',
+  'text!templates/filtersortwidgets.mustache',
   'utils',
-], function($, Backbone, SongsByShowCollection, SongView, MapView, utils){
+], function($, Backbone, Mustache, SongsByShowCollection, SongView,
+  MapView, searchwidget, filtersortwidgets, utils){
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
@@ -29,6 +33,13 @@ define([
       var latlons = utils.modelsLatLons(self.songs.models);
       var mapview = new MapView(null, {latlons: latlons});
       mapview.render();
+
+      // Render the search widget
+      var searchRendered = Mustache.render(searchwidget);
+      self.$el.append(searchRendered);
+      // Render the filter widgets
+      var filtersortRendered = Mustache.render(filtersortwidgets);
+      self.$el.append(filtersortRendered);
 
       // Render the songs list
       self.songs.each(function(song) {
