@@ -73,7 +73,9 @@ def geocode_listings():
 
 
 if __name__ == "__main__":
+    print "Geocoding listings"
     geocoded_listings = geocode_listings()
+    print "Writing geocoded listings to file"
     with open('data/geocoded_listings.txt', 'w') as fout:
         fieldnames = ['date', 'venue', 'location', 'lat', 'lon']
         writer = DictWriter(fout, fieldnames=fieldnames)

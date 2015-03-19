@@ -42,10 +42,10 @@ def download_shows(crawl_delay=1):
 
 @task
 @hosts([host])
-def download_songs(crawl_delay=1):
+def download_songs(*years):
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/data_scraping/archive_api/download_songs.py %s' % crawl_delay)
+            run('virtualenv/bin/python gdmap/data_scraping/archive_api/download_songs.py %s' % ' '.join(years))
 
 
 @task
@@ -89,11 +89,11 @@ def locations_from_mongo():
 
 @task
 @hosts([host])
-def crawl_show_listings():
+def download_show_listings():
     """Generate the list of locations."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/data_scraping/dead_net/crawl_show_listings.py')
+            run('virtualenv/bin/python gdmap/data_scraping/dead_net/download_show_listings.py')
 
 
 @task

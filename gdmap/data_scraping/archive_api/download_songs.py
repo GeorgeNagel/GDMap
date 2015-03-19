@@ -164,10 +164,14 @@ def dump_songs_json(year):
             fout.write('%s\n' % song.to_json())
 
 if __name__ == '__main__':
-    crawl_delay_seconds = int(sys.argv[1])
     Song.objects.delete()
-    years = range(1967, 1996)
+    if len(sys.argv[1:]) > 0:
+        # Get songs info from specific years
+        years = [int(year) for year in sys.argv[1:]]
+    else:
+        # Get all songs
+        years = range(1967, 1996)
     for year in years:
         print "Downloading songs for year: %s" % year
-        download_songs(year, crawl_delay_seconds=crawl_delay_seconds)
+        download_songs(year)
         dump_songs_json(year)
