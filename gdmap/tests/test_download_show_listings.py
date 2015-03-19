@@ -3,7 +3,7 @@ import unittest
 
 from mock import Mock
 
-from gdmap.data_scraping.dead_net.crawl_show_listings import parse_show_page
+from gdmap.data_scraping.dead_net.download_show_listings import parse_show_page
 from gdmap.settings import TEST_FIXTURES_DIR
 
 
