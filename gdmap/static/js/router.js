@@ -33,11 +33,13 @@ define([
       indexView.render(); 
     },
     searchSongs: function(query) {
-      var searchView = new SearchView({"query": query});
+      var params = this.parse_query_parameters(query);
+      var searchView = new SearchView({"urlParams": params, "query": query});
       searchView.render();
     },
     songs: function(query) {
-      var songsView = new SongsView({"query": query});
+      var params = this.parse_query_parameters(query);
+      var songsView = new SongsView({"urlParams": params, "query": query});
       songsView.render();
     },
     recording: function(show_id) {
@@ -45,11 +47,34 @@ define([
       recordingView.render();
     },
     recordings: function(query) {
-      var recordingsView = new RecordingsView({"query": query});
+      var params = this.parse_query_parameters(query);
+      var recordingsView = new RecordingsView({"urlParams": params, "query": query});
       recordingsView.render();
     },
     defaultAction: function(actions) {
       console.log("No route:", actions);
+    },
+    parse_query_parameters: function(queryString) {
+      // http://stackoverflow.com/questions/11671400/navigate-route-with-querystring
+      var params = {};
+        if(queryString){
+          _.each(
+            _.map(decodeURI(queryString).split(/&/g),function(el,i){
+              var aux = el.split('='), o = {};
+              if(aux.length >= 1){
+                var val = undefined;
+                if(aux.length == 2)
+                  val = aux[1];
+                o[aux[0]] = val;
+              }
+              return o;
+            }),
+            function(o){
+              _.extend(params,o);
+            }
+          );
+        }
+      return params;
     }
   });
 
@@ -58,6 +83,18 @@ define([
     // Navigate using urls rather than hashes
     // e.g. /songs/ rather than /#songs
     Backbone.history.start({pushState: true});
+    // Use router.navigate for all urls
+    // http://stackoverflow.com/questions/9328513/backbone-js-and-pushstate
+    $(document).on('click', 'a:not([data-bypass])', function (evt) {
+
+      var href = $(this).attr('href');
+      var protocol = this.protocol + '//';
+
+      if (href.slice(protocol.length) !== protocol) {
+        evt.preventDefault();
+        app_router.navigate(href, true);
+      }
+    });
   };
   return {
     initialize: initialize

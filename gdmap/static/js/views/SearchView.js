@@ -14,7 +14,7 @@ define([
   return Backbone.View.extend({
     el: $("#container"),
     events: {
-      "blur .js-search-bar": "updateQuery"
+      "blur .js-search-bar": "updateSearchTerm"
     },
     initialize: function(options) {
       var self = this;
@@ -27,16 +27,23 @@ define([
       });
       this.songs = songs;
     },
-    updateQuery: function() {
+    updateSearchTerm: function() {
       var self = this;
       var inputEl = $(".js-search-bar");
       var searchText = inputEl.val();
-      this.songs.updateParameters({'q': searchText});
-      this.songs.fetch({
-        success: function() {
-          self.render();
-        }
-      });
+      // Update the query parameters for the collection
+      this.options.urlParams.q = searchText;
+      var queryString = this.buildQuery(this.options.urlParams);
+      var url = "/search/?" + queryString;
+      this.router.navigate(url, {"trigger": true});
+    },
+    buildQuery: function(query_parameters) {
+      var newQueryParameters = [];
+      for (var key in query_parameters) {
+        newQueryParameters.push(key + "=" + query_parameters[key]);
+      }
+      var newQuery = newQueryParameters.join("&");
+      return newQuery;
     },
     render: function(){
       var self = this;

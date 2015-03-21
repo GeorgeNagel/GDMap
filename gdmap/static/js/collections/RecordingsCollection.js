@@ -1,14 +1,12 @@
 define([
-  'collections/BaseCollection'
+  'backbone'
 ], function(BaseCollection){
   "use strict";
-  return BaseCollection.extend({
+  return Backbone.Collection.extend({
     initialize: function(models, options) {
         this.models = models;
         this.options = options;
-        var query = options.query || "";
-        this.options.query_parameters = this.parse_query_parameters(query);
-        this.url = "/api/recordings/" + "?" + query;
+        this.url = "/api/recordings/" + "?" + this.options.query;
     },
     parse: function(response) {
         // Parse the recordings
