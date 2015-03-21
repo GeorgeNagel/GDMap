@@ -13,6 +13,9 @@ define([
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
+    events: {
+      "blur .js-search-bar": "updateQuery"
+    },
     initialize: function(options) {
       var self = this;
       self.options = options;
@@ -23,6 +26,17 @@ define([
         }
       });
       this.songs = songs;
+    },
+    updateQuery: function() {
+      var self = this;
+      var inputEl = $(".js-search-bar");
+      var searchText = inputEl.val();
+      this.songs.updateParameters({'q': searchText});
+      this.songs.fetch({
+        success: function() {
+          self.render();
+        }
+      });
     },
     render: function(){
       var self = this;
