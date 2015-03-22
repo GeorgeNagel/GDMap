@@ -34,7 +34,7 @@ define([
     },
     searchSongs: function(query) {
       var params = this.parse_query_parameters(query);
-      var searchView = new SearchView({"urlParams": params, "query": query});
+      var searchView = new SearchView({"urlParams": params, "query": query, "router": this});
       searchView.render();
     },
     songs: function(query) {

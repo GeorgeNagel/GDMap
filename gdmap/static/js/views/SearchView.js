@@ -14,7 +14,8 @@ define([
   return Backbone.View.extend({
     el: $("#container"),
     events: {
-      "blur .js-search-bar": "updateSearchTerm"
+      "click .js-search-button": "updateSearchTerm",
+      "keyup .js-search-input": "typeSearchTerm"
     },
     initialize: function(options) {
       var self = this;
@@ -27,15 +28,23 @@ define([
       });
       this.songs = songs;
     },
+    typeSearchTerm: function(e) {
+      // Allow the user to type 'enter' to submit a new search
+      if(e.keyCode == 13){
+        this.updateSearchTerm();
+      }
+    },
     updateSearchTerm: function() {
       var self = this;
-      var inputEl = $(".js-search-bar");
+      var inputEl = $(".js-search-input");
       var searchText = inputEl.val();
       // Update the query parameters for the collection
       this.options.urlParams.q = searchText;
       var queryString = this.buildQuery(this.options.urlParams);
       var url = "/search/?" + queryString;
-      this.router.navigate(url, {"trigger": true});
+      // Don't listen to any more events for this view.
+      this.undelegateEvents();
+      this.options.router.navigate(url, {"trigger": true});
     },
     buildQuery: function(query_parameters) {
       var newQueryParameters = [];
