@@ -73,7 +73,7 @@ def batch_index_songs(song_dicts):
 
 def index_songs(year):
     """Index all of the songs into elasticsearch from data in .jl files."""
-    print "Indexing songs for year: %s" % year
+    log.info("Indexing songs for year: %s" % year)
     songs_jl = os.path.join(DATA_DIRECTORY, 'songs/%s.jl' % year)
     # Read the songs in from file
     songs = []

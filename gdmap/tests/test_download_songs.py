@@ -38,7 +38,7 @@ class TestDownloadSongs(unittest.TestCase):
 
                 self.assertEqual(Song.objects.count(), 0)
 
-                download_songs()
+                download_songs(1990)
 
                 self.assertEqual(Song.objects.count(), 19)
 
@@ -83,7 +83,7 @@ class TestDownloadSongs(unittest.TestCase):
 
                 self.assertEqual(Song.objects.count(), 0)
 
-                download_songs()
+                download_songs(1984)
 
                 self.assertEqual(Song.objects.count(), 15)
 
@@ -126,7 +126,7 @@ class TestDownloadSongs(unittest.TestCase):
                 ids_mock.return_value = ['abc123']
                 get_mock.return_value = mock_response
 
-                download_songs()
+                download_songs(1990)
 
                 self.assertEqual(Song.objects.count(), 0)
 
@@ -149,7 +149,7 @@ class TestDownloadSongs(unittest.TestCase):
                 ids_mock.return_value = ['abc123']
                 get_mock.return_value = mock_response
 
-                download_songs()
+                download_songs(1990)
 
                 self.assertEqual(Song.objects.count(), 0)
 
