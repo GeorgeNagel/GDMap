@@ -43,7 +43,7 @@ SONG_MAPPINGS = {
 }
 
 
-def create_index():
+def recreate_index():
     # Delete the entire index
     if es.indices.exists(ELASTICSEARCH_INDEX_NAME):
         log.info("Removing index: %s" % ELASTICSEARCH_INDEX_NAME)
@@ -91,7 +91,7 @@ def query_es(query_body):
     return res
 
 if __name__ == "__main__":
-    create_index()
+    recreate_index()
     years = range(1967, 1996)
     for year in years:
         index_songs(year)

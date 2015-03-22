@@ -2,7 +2,7 @@
 from datetime import datetime
 from csv import reader, DictWriter, DictReader
 
-from gdmap.data_scraping.dead_net.crawl_show_listings import crawl_show_listings
+from gdmap.data_scraping.dead_net.download_show_listings import crawl_show_listings
 
 
 def read_geocoded_locations():
