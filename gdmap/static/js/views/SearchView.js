@@ -15,7 +15,9 @@ define([
     el: $("#container"),
     events: {
       "click .js-search-button": "updateSearchTerm",
-      "keyup .js-search-input": "typeSearchTerm"
+      "keyup .js-search-input": "typeSearchTerm",
+      "click .js-sort-date": "toggleSortDate",
+      "click .js-sort-relevance": "toggleSortRelevance"
     },
     initialize: function(options) {
       var self = this;
@@ -40,7 +42,32 @@ define([
       var searchText = inputEl.val();
       // Update the query parameters for the collection
       this.options.urlParams.q = searchText;
-      var queryString = this.buildQuery(this.options.urlParams);
+      this.navigateFromURLParams(this.options.urlParams);
+    },
+    toggleSortDate: function() {
+      this.toggleSort('date', 'asc');
+    },
+    toggleSortRelevance: function() {
+      // A higher relevance score is better, so sort in descending order
+      this.toggleSort('relevance', 'desc');
+    },
+    toggleSort: function(sortField, defaultOrder) {
+      // Toggle the sort order for a sort type and default order
+      if (!('sort' in this.options.urlParams) || !('sort_order' in this.options.urlParams) || (this.options.urlParams.sort !== sortField)) {
+        this.options.urlParams.sort = sortField;
+        this.options.urlParams.sort_order = defaultOrder;
+      } else {
+        if (this.options.urlParams.sort_order === "asc") {
+          this.options.urlParams.sort_order = "desc";
+        } else {
+          this.options.urlParams.sort_order = "asc";
+        }
+      }
+      this.navigateFromURLParams(this.options.urlParams);
+    },
+    navigateFromURLParams: function(urlParams) {
+      // Navigate to a new page given new url parameters
+      var queryString = this.buildQuery(urlParams);
       var url = "/search/?" + queryString;
       // Don't listen to any more events for this view.
       this.undelegateEvents();
