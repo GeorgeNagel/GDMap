@@ -65,7 +65,7 @@ define([
       mapview.render();
 
       // Render the search widget
-      var searchRendered = Mustache.render(searchwidget);
+      var searchRendered = Mustache.render(searchwidget, {search_terms: this.options.urlParams.q});
       self.$el.append(searchRendered);
       // Render the filter widgets
       var filtersortRendered = Mustache.render(filtersortwidgets);
