@@ -36,9 +36,9 @@ class TestDownloadShows(unittest.TestCase):
                 self.assertEqual(
                     m_open.mock_calls,
                     [
-                        call('/home/vagrant/gdmap/data/shows.csv', 'w'),
+                        call('/home/vagrant/gdmap/gdmap/tests/fixtures/data/shows.csv', 'w'),
                         call().__enter__(),
-                        call().write('show_id,date\r\n'),
+                        call().write('identifier,date\r\n'),
                         call().write('gd1986-03-28.nak300.morris.crazyfingers.106564.flac16,1986-03-28T00:00:00Z\r\n'),
                         call().write('gd1984-06-27.senn.hubbard.bandrofcheck.81509.sbefail.flac16,1984-06-27T00:00:00Z\r\n'),  # noqa
                         call().write('gd1990-03-26.AKG451.Berger.Currier.Keo.120942.Flac2496,1990-03-26T00:00:00Z\r\n'),
