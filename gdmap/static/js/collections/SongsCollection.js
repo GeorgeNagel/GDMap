@@ -6,8 +6,7 @@ define([
     initialize: function(models, options) {
         this.models = models;
         this.options = options;
-        var query = "?" + options.query || "";
-        this.url = "/api/songs/" + query;
+        this.url = "/api/songs/?" + this.options.query;
     },
     parse: function(response) {
         return response.songs;

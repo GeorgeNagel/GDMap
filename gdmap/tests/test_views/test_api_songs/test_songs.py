@@ -2,188 +2,189 @@ import json
 import time
 
 from gdmap.es_index import index_songs
-from gdmap.models import Song
 from gdmap.settings import logging
-from gdmap.tests.utils import mongo_clean, APITestCase
+from gdmap.tests.utils import index_clean, APITestCase
 
 log = logging.getLogger(__name__)
 
 
 class SongsAPITestCase(APITestCase):
-    def setUp(self):
-        # Songs from one show
-        self.test_song_1 = Song(sha1='abc123',
-                                show_id='test_show_id',
-                                filename='test_filename',
-                                album='test album',
-                                title='test_title',
-                                track=1,
-                                date='1980-01-02',
-                                location='New York, NY',
-                                latlon='1,2')
-
-        # A song from another show
-        self.test_song_2 = Song(sha1='abc1232',
-                                show_id='test_show_id_2',
-                                filename='test_filename_2',
-                                album='test album_2',
-                                title='test_title_2',
-                                track=2,
-                                date='1990-01-01',
-                                location='Bingo, NY',
-                                latlon='1,2')
-        super(SongsAPITestCase, self).setUp()
-
-    @mongo_clean
+    @index_clean
     def test_query_all(self):
         """Test the results of querying for all songs."""
         self.maxDiff = None
-        log.debug("Saving song in Mongo.")
-        self.test_song_1.save()
-        self.assertEqual(Song.objects.count(), 1)
-        log.debug("Indexing test song.")
-        index_songs()
+        index_songs(1990)
         # Wait for the song to be indexed
         time.sleep(2)
-        log.debug("Getting all indexed songs.")
         response = self.app.get('/api/songs/')
         self.assertEqual(
             json.loads(response.data),
             {
                 u'songs': [
                     {
-                        u'album': u'test album',
-                        u'date': u'1980-01-02',
-                        u'filename': u'test_filename',
-                        u'location': u'New York, NY',
-                        u'show_id': u'test_show_id',
-                        u'title': u'test_title',
-                        u'latlon': u'1,2',
-                        u'track': 1
+                        u'_id': u'4ebd25dad72908f3fa370d9b9ea29fb6d82f9e1b',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t04.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'We Can Run',
+                        u'track': 4,
+                        u'venue': u'Civic Center'
                     },
+                    {
+                        u'_id': u'917c5b38b870625994a003ca2beed5e4ab45f5f4',
+                        u'album': u'1990-03-25 - Knickerbocker Arena',
+                        u'date': u'1990-03-25',
+                        u'filename': u'gd90-03-25MTd2t03.shn',
+                        u'latlon': u'42.6525793,-73.7562317',
+                        u'location': u'Albany, NY',
+                        u'show_id': u'gd1990-03-25.sbd.hollister.7508.shnf',
+                        u'title': u'Crazy Fingers',
+                        u'track': 11,
+                        u'venue': u'Knickerbocker Arena'
+                    },
+                    {
+                        u'_id': u'fdee660848cd1a28e6520f1b19760b2050194301',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t02.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'Hell in a Bucket',
+                        u'track': 2,
+                        u'venue': u'Civic Center'
+                    }
                 ],
-                u'total': 1
+                u'total': 3
             }
         )
 
-    @mongo_clean
+    @index_clean
     def test_sort(self):
         """Test sorting the songs."""
         self.maxDiff = None
-        log.debug("Saving song in Mongo.")
-        # Save songs from show 1
-        self.test_song_1.save()
-        # Save songs from show 2
-        self.test_song_2.save()
-        self.assertEqual(Song.objects.count(), 2)
-
-        log.debug("Indexing test songs.")
-        index_songs()
+        index_songs(1990)
         # Wait for the song to be indexed
         time.sleep(2)
-        log.debug("Getting all indexed songs.")
-        # Query for every song with 'test' in the title or elsewhere
         response = self.app.get('/api/songs/?sort=date&sort_order=desc')
         self.assertEqual(
             json.loads(response.data),
             {
                 u'songs': [
                     {
-                        u'album': u'test album_2',
-                        u'date': u'1990-01-01',
-                        u'filename': u'test_filename_2',
-                        u'location': u'Bingo, NY',
-                        u'show_id': u'test_show_id_2',
-                        u'title': u'test_title_2',
-                        u'latlon': u'1,2',
-                        u'track': 2
+                        u'_id': u'917c5b38b870625994a003ca2beed5e4ab45f5f4',
+                        u'album': u'1990-03-25 - Knickerbocker Arena',
+                        u'date': u'1990-03-25',
+                        u'filename': u'gd90-03-25MTd2t03.shn',
+                        u'latlon': u'42.6525793,-73.7562317',
+                        u'location': u'Albany, NY',
+                        u'show_id': u'gd1990-03-25.sbd.hollister.7508.shnf',
+                        u'title': u'Crazy Fingers',
+                        u'track': 11,
+                        u'venue': u'Knickerbocker Arena'
                     },
                     {
-                        u'album': u'test album',
-                        u'date': u'1980-01-02',
-                        u'filename': u'test_filename',
-                        u'location': u'New York, NY',
-                        u'show_id': u'test_show_id',
-                        u'title': u'test_title',
-                        u'latlon': u'1,2',
-                        u'track': 1
+                        u'_id': u'4ebd25dad72908f3fa370d9b9ea29fb6d82f9e1b',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t04.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'We Can Run',
+                        u'track': 4,
+                        u'venue': u'Civic Center'
+                    },
+                    {
+                        u'_id': u'fdee660848cd1a28e6520f1b19760b2050194301',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t02.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'Hell in a Bucket',
+                        u'track': 2,
+                        u'venue': u'Civic Center'
                     }
                 ],
-                u'total': 2
+                u'total': 3
             }
         )
 
-    @mongo_clean
+    @index_clean
     def test_pagination(self):
         """Test paginating the songs."""
         self.maxDiff = None
-        log.debug("Saving song in Mongo.")
-        # Save songs from show 1
-        self.test_song_1.save()
-        # Save songs from show 2
-        self.test_song_2.save()
-        self.assertEqual(Song.objects.count(), 2)
-
-        log.debug("Indexing test songs.")
-        index_songs()
+        index_songs(1990)
         # Wait for the song to be indexed
         time.sleep(2)
         log.debug("Getting all indexed songs.")
-        # Query for every song with 'test' in the title or elsewhere
         response = self.app.get('/api/songs/?sort=date&sort_order=asc&page=2&per_page=1')
         self.assertEqual(
             json.loads(response.data),
             {
                 u'songs': [
                     {
-                        u'album': u'test album_2',
-                        u'date': u'1990-01-01',
-                        u'filename': u'test_filename_2',
-                        u'location': u'Bingo, NY',
-                        u'show_id': u'test_show_id_2',
-                        u'title': u'test_title_2',
-                        u'latlon': u'1,2',
-                        u'track': 2
+                        u'_id': u'fdee660848cd1a28e6520f1b19760b2050194301',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t02.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'Hell in a Bucket',
+                        u'track': 2,
+                        u'venue': u'Civic Center'
                     }
                 ],
-                u'total': 2
+                u'total': 3
             }
         )
 
-    @mongo_clean
+    @index_clean
     def test_album_search(self):
         """Test paginating the songs."""
         self.maxDiff = None
-        log.debug("Saving song in Mongo.")
-        # Save songs from show 1
-        self.test_song_1.save()
-        # Save songs from show 2
-        self.test_song_2.save()
-        self.assertEqual(Song.objects.count(), 2)
-
-        log.debug("Indexing test songs.")
-        index_songs()
+        index_songs(1990)
         # Wait for the song to be indexed
         time.sleep(2)
         log.debug("Getting all indexed songs.")
         # Query for every song with 'test' in the title or elsewhere
-        response = self.app.get('/api/songs/?album=test album_2')
+        response = self.app.get('/api/songs/?album=1990-03-19 - Civic Center')
         self.assertEqual(
             json.loads(response.data),
             {
                 u'songs': [
                     {
-                        u'album': u'test album_2',
-                        u'date': u'1990-01-01',
-                        u'filename': u'test_filename_2',
-                        u'location': u'Bingo, NY',
-                        u'show_id': u'test_show_id_2',
-                        u'title': u'test_title_2',
-                        u'latlon': u'1,2',
-                        u'track': 2
+                        u'_id': u'4ebd25dad72908f3fa370d9b9ea29fb6d82f9e1b',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t04.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'We Can Run',
+                        u'track': 4,
+                        u'venue': u'Civic Center'
+                    },
+                    {
+                        u'_id': u'fdee660848cd1a28e6520f1b19760b2050194301',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t02.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'Hell in a Bucket',
+                        u'track': 2,
+                        u'venue': u'Civic Center'
                     }
                 ],
-                u'total': 1
+                u'total': 2
             }
         )
 

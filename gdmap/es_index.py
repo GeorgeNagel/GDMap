@@ -43,7 +43,7 @@ SONG_MAPPINGS = {
 }
 
 
-def create_index():
+def recreate_index():
     # Delete the entire index
     if es.indices.exists(ELASTICSEARCH_INDEX_NAME):
         log.info("Removing index: %s" % ELASTICSEARCH_INDEX_NAME)
@@ -73,7 +73,7 @@ def batch_index_songs(song_dicts):
 
 def index_songs(year):
     """Index all of the songs into elasticsearch from data in .jl files."""
-    print "Indexing songs for year: %s" % year
+    log.info("Indexing songs for year: %s" % year)
     songs_jl = os.path.join(DATA_DIRECTORY, 'songs/%s.jl' % year)
     # Read the songs in from file
     songs = []
@@ -91,7 +91,7 @@ def query_es(query_body):
     return res
 
 if __name__ == "__main__":
-    create_index()
+    recreate_index()
     years = range(1967, 1996)
     for year in years:
         index_songs(year)
