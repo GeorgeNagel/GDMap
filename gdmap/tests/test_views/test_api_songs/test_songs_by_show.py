@@ -57,7 +57,10 @@ class SongsByShowAPITestCase(APITestCase):
                         ],
                         u'total': 2
                     }
-                ]
+                ],
+                u'total': 2,
+                u'page': 1,
+                u'per_page': 10
             }
         )
 
@@ -109,7 +112,10 @@ class SongsByShowAPITestCase(APITestCase):
                         ],
                         u'total': 2
                     }
-                ]
+                ],
+                u'total': 2,
+                u'page': 1,
+                u'per_page': 10
             }
         )
 
@@ -143,7 +149,10 @@ class SongsByShowAPITestCase(APITestCase):
                         ],
                         u'total': 2
                     }
-                ]
+                ],
+                u'total': 2,
+                u'page': 2,
+                u'per_page': 1
             }
         )
 

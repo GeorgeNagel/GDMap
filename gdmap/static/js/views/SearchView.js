@@ -7,9 +7,10 @@ define([
   'views/MapView',
   'text!templates/searchwidget.mustache',
   'text!templates/filtersortwidgets.mustache',
+  'text!templates/paginatewidget.mustache',
   'utils',
 ], function($, Backbone, Mustache, SongsByShowCollection, SongView,
-  MapView, searchwidget, filtersortwidgets, utils){
+  MapView, searchwidget, filtersortwidgets, paginatewidget, utils){
   "use strict";
   return Backbone.View.extend({
     el: $("#container"),
@@ -17,6 +18,8 @@ define([
       "click .js-search-button": "updateSearchTerms",
       "click .js-sort-date": "toggleSortDate",
       "click .js-sort-relevance": "toggleSortRelevance",
+      "click .js-page-prev": "previousPage",
+      "click .js-page-next": "nextPage",
       "keyup .js-search-input": "typeSearchTerm",
       "keyup .js-filter-date-start": "typeSearchTerm",
       "keyup .js-filter-date-end": "typeSearchTerm",
@@ -76,6 +79,31 @@ define([
       }
       this.navigateFromURLParams(this.options.urlParams);
     },
+    previousPage: function() {
+      // Paginate backwards through results
+      var currentPage = 1;
+      if ('page' in this.options.urlParams) {
+        // Cast the page url parameter to an int
+        currentPage = Math.floor(this.options.urlParams.page);
+      }
+      var previousPage = currentPage - 1;
+      if (previousPage < 1) {
+        previousPage = 1;
+      }
+      this.options.urlParams.page = previousPage;
+      this.navigateFromURLParams(this.options.urlParams);
+    },
+    nextPage: function() {
+      // Paginate through results
+      var currentPage = 1;
+      if ('page' in this.options.urlParams) {
+        // Cast the page url parameter to an int
+        currentPage = Math.floor(this.options.urlParams.page);
+      }
+      var nextPage = currentPage + 1;
+      this.options.urlParams.page = nextPage;
+      this.navigateFromURLParams(this.options.urlParams);
+    },
     navigateFromURLParams: function(urlParams) {
       // Navigate to a new page given new url parameters
       var queryString = this.buildQuery(urlParams);
@@ -105,6 +133,7 @@ define([
       // Render the search widget
       var searchRendered = Mustache.render(searchwidget, {search_terms: this.options.urlParams.q});
       self.$el.append(searchRendered);
+
       // Render the filter widgets
       var filterContext = {
         date_start: this.options.urlParams.date_gte,
@@ -112,6 +141,14 @@ define([
       }
       var filtersortRendered = Mustache.render(filtersortwidgets, filterContext);
       self.$el.append(filtersortRendered);
+
+      // Render the paginate widget
+      var paginateContext = {
+        prevPageExists: this.songs.hasPreviousPage(),
+        nextPageExists: this.songs.hasNextPage()
+      }
+      var paginateRendered = Mustache.render(paginatewidget, paginateContext);
+      self.$el.append(paginateRendered);
 
       // Render the songs list
       self.songs.each(function(song) {
