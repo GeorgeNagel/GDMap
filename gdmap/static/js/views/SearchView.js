@@ -14,10 +14,12 @@ define([
   return Backbone.View.extend({
     el: $("#container"),
     events: {
-      "click .js-search-button": "updateSearchTerm",
-      "keyup .js-search-input": "typeSearchTerm",
+      "click .js-search-button": "updateSearchTerms",
       "click .js-sort-date": "toggleSortDate",
-      "click .js-sort-relevance": "toggleSortRelevance"
+      "click .js-sort-relevance": "toggleSortRelevance",
+      "keyup .js-search-input": "typeSearchTerm",
+      "keyup .js-filter-date-start": "typeSearchTerm",
+      "keyup .js-filter-date-end": "typeSearchTerm",
     },
     initialize: function(options) {
       var self = this;
@@ -33,15 +35,24 @@ define([
     typeSearchTerm: function(e) {
       // Allow the user to type 'enter' to submit a new search
       if(e.keyCode == 13){
-        this.updateSearchTerm();
+        this.updateSearchTerms();
       }
     },
-    updateSearchTerm: function() {
+    updateSearchTerms: function() {
       var self = this;
+      // Update the phrase search terms
       var inputEl = $(".js-search-input");
       var searchText = inputEl.val();
-      // Update the query parameters for the collection
       this.options.urlParams.q = searchText;
+      // Update the start date filter
+      var dateStartEl = $(".js-filter-date-start");
+      var dateStartText = dateStartEl.val();
+      this.options.urlParams.date_gte = dateStartText;
+      // Update the end date filter
+      var dateEndEl = $(".js-filter-date-end");
+      var dateEndText = dateEndEl.val();
+      this.options.urlParams.date_lte = dateEndText;
+      // Navigate to the new URL
       this.navigateFromURLParams(this.options.urlParams);
     },
     toggleSortDate: function() {
@@ -95,7 +106,11 @@ define([
       var searchRendered = Mustache.render(searchwidget, {search_terms: this.options.urlParams.q});
       self.$el.append(searchRendered);
       // Render the filter widgets
-      var filtersortRendered = Mustache.render(filtersortwidgets);
+      var filterContext = {
+        date_start: this.options.urlParams.date_gte,
+        date_end: this.options.urlParams.date_lte
+      }
+      var filtersortRendered = Mustache.render(filtersortwidgets, filterContext);
       self.$el.append(filtersortRendered);
 
       // Render the songs list
