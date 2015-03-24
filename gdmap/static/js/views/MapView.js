@@ -5,7 +5,7 @@ define([
 ], function(Backbone, $){
   "use strict";
   return Backbone.View.extend({
-    el: $("#map-canvas"),
+    el: "#map",
     initialize: function(model, options) {
         this.latlons = options.latlons;
     },

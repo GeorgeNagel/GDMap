@@ -2,13 +2,14 @@ define([
   'backbone',
   'mustache',
   'collections/RecordingsCollection',
+  'text!templates/listpage.mustache',
   'text!templates/recording.mustache',
   'views/MapView',
   'utils',
-], function(Backbone, Mustache, RecordingsCollection, recordingtemplate, MapView, utils){
+], function(Backbone, Mustache, RecordingsCollection, listpage, recordingtemplate, MapView, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#container"),
+    el: $("#content"),
     initialize: function(options) {
       var self = this;
       var showID = options.show_id;
@@ -23,7 +24,10 @@ define([
       this.recordings = recordings;
     },
     render: function(){
-      this.$el.html("<h1>Recording</h1>");
+      // Render the basic template
+      var pageRendered = Mustache.render(listpage);
+      this.$el.html(pageRendered);
+      $("#menu").html("<h1>Recording</h1>");
       var recording = this.recordings.first();
       if (recording) {
         // Render the map
@@ -32,7 +36,7 @@ define([
         mapview.render();
         // Render the recording
         var rendered = Mustache.render(recordingtemplate, recording.attributes);
-        this.$el.append(rendered);
+        $("#list").append(rendered);
       }
     }
   })

@@ -1,13 +1,15 @@
 define([
   'backbone',
+  'mustache',
   'collections/SongsCollection',
   'views/SongView',
   'views/MapView',
+  'text!templates/listpage.mustache',
   'utils'
-], function(Backbone, SongsCollection, SongView, MapView, utils){
+], function(Backbone, Mustache, SongsCollection, SongView, MapView, listpage, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#container"),
+    el: $("#content"),
     initialize: function(options) {
       var self = this;
       var songs = new SongsCollection([], options);
@@ -20,7 +22,11 @@ define([
     },
     render: function(){
       var self = this;
-      self.$el.html("<h1>Songs</h1>");
+      // Render the base template
+      var pageRendered = Mustache.render(listpage);
+      self.$el.html(pageRendered);
+
+      $("#menu").html("<h1>Songs</h1>");
 
       // Render the map
       var latlons = utils.modelsLatLons(self.songs.models);
@@ -30,7 +36,7 @@ define([
       // Render the songs list
       self.songs.each(function(song) {
         var view = new SongView(song);
-        self.$el.append(view.render());
+        $("#list").append(view.render());
       });
     }
   })

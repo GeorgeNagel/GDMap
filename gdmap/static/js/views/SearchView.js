@@ -5,15 +5,17 @@ define([
   'collections/SongsByShowCollection',
   'views/SongView',
   'views/MapView',
+  'text!templates/searchpage.mustache',
   'text!templates/searchwidget.mustache',
-  'text!templates/filtersortwidgets.mustache',
+  'text!templates/filterwidgets.mustache',
+  'text!templates/sortwidgets.mustache',
   'text!templates/paginatewidget.mustache',
   'utils',
 ], function($, Backbone, Mustache, SongsByShowCollection, SongView,
-  MapView, searchwidget, filtersortwidgets, paginatewidget, utils){
+  MapView, searchpage, searchwidget, filterwidgets, sortwidgets, paginatewidget, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#container"),
+    el: $("#content"),
     events: {
       "click .js-search-button": "updateSearchTerms",
       "click .js-sort-date": "toggleSortDate",
@@ -123,7 +125,10 @@ define([
     render: function(){
       var self = this;
 
-      self.$el.html("<h1>Search</h1>");
+      // Fill in the basic template on which to hang everything else
+      self.$el.html(Mustache.render(searchpage));
+
+      $("#menu").html("<h1>Search</h1>");
 
       // Render the map
       var latlons = utils.modelsLatLons(self.songs.models);
@@ -132,15 +137,19 @@ define([
 
       // Render the search widget
       var searchRendered = Mustache.render(searchwidget, {search_terms: this.options.urlParams.q});
-      self.$el.append(searchRendered);
+      $("#search-bar").html(searchRendered);
 
       // Render the filter widgets
       var filterContext = {
         date_start: this.options.urlParams.date_gte,
         date_end: this.options.urlParams.date_lte
       }
-      var filtersortRendered = Mustache.render(filtersortwidgets, filterContext);
-      self.$el.append(filtersortRendered);
+      var filtersRendered = Mustache.render(filterwidgets, filterContext);
+      $("#filters").html(filtersRendered);
+
+      // Render the sort widgets
+      var sortRendered = Mustache.render(sortwidgets);
+      $("#sort").html(sortRendered);
 
       // Render the paginate widget
       var paginateContext = {
@@ -148,12 +157,13 @@ define([
         nextPageExists: this.songs.hasNextPage()
       }
       var paginateRendered = Mustache.render(paginatewidget, paginateContext);
-      self.$el.append(paginateRendered);
+      $("#paginate").html(paginateRendered);
 
       // Render the songs list
+      $("#list").html("");
       self.songs.each(function(song) {
         var view = new SongView(song, self.options);
-        self.$el.append(view.render());
+        $("#list").append(view.render());
       });
     }
   })

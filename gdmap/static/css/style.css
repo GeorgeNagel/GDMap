@@ -1,6 +1,8 @@
-html, body, #map-canvas {
-    height: 300px;
-    width: 300px;
-    margin: 0px;
-    padding: 0px
+#map {
+  height: 300px;
+  width: 300px;
+}
+.list-box {
+  background-color: #EEE;
+  margin-top: 5px;
 }
