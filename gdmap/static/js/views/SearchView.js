@@ -5,16 +5,17 @@ define([
   'collections/SongsByShowCollection',
   'views/SongView',
   'views/MapView',
+  'text!templates/searchpage.mustache',
   'text!templates/searchwidget.mustache',
   'text!templates/filterwidgets.mustache',
   'text!templates/sortwidgets.mustache',
   'text!templates/paginatewidget.mustache',
   'utils',
 ], function($, Backbone, Mustache, SongsByShowCollection, SongView,
-  MapView, searchwidget, filterwidgets, sortwidgets, paginatewidget, utils){
+  MapView, searchpage, searchwidget, filterwidgets, sortwidgets, paginatewidget, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#list"),
+    el: $("#content"),
     events: {
       "click .js-search-button": "updateSearchTerms",
       "click .js-sort-date": "toggleSortDate",
@@ -124,6 +125,9 @@ define([
     render: function(){
       var self = this;
 
+      // Fill in the basic template on which to hang everything else
+      self.$el.html(Mustache.render(searchpage));
+
       $("#menu").html("<h1>Search</h1>");
 
       // Render the map
@@ -156,10 +160,10 @@ define([
       $("#paginate").html(paginateRendered);
 
       // Render the songs list
-      self.$el.html();
+      $("#list").html("");
       self.songs.each(function(song) {
         var view = new SongView(song, self.options);
-        self.$el.append(view.render());
+        $("#list").append(view.render());
       });
     }
   })
