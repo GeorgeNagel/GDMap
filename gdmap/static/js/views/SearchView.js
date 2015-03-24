@@ -14,7 +14,7 @@ define([
   MapView, searchwidget, filterwidgets, sortwidgets, paginatewidget, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#content"),
+    el: $("#list"),
     events: {
       "click .js-search-button": "updateSearchTerms",
       "click .js-sort-date": "toggleSortDate",
@@ -145,7 +145,7 @@ define([
 
       // Render the sort widgets
       var sortRendered = Mustache.render(sortwidgets);
-      this.$el.html(sortRendered);
+      $("#sort").html(sortRendered);
 
       // Render the paginate widget
       var paginateContext = {
@@ -153,9 +153,10 @@ define([
         nextPageExists: this.songs.hasNextPage()
       }
       var paginateRendered = Mustache.render(paginatewidget, paginateContext);
-      self.$el.append(paginateRendered);
+      $("#paginate").html(paginateRendered);
 
       // Render the songs list
+      self.$el.html();
       self.songs.each(function(song) {
         var view = new SongView(song, self.options);
         self.$el.append(view.render());
