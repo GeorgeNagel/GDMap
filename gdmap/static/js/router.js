@@ -3,12 +3,11 @@ define([
   "jquery",
   "underscore",
   "backbone",
-  "views/IndexView",
   "views/SearchView",
   "views/SongsView",
   "views/RecordingView",
   "views/RecordingsView"
-], function($, _, Backbone, IndexView, SearchView, SongsView, RecordingView, RecordingsView){
+], function($, _, Backbone, SearchView, SongsView, RecordingView, RecordingsView){
   "use strict";
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -29,8 +28,7 @@ define([
       "*actions": "defaultAction"
     },
     index: function() {
-      var indexView = new IndexView();
-      indexView.render(); 
+      this.navigate("/search/", {trigger: true});
     },
     searchSongs: function(query) {
       var params = this.parse_query_parameters(query);
