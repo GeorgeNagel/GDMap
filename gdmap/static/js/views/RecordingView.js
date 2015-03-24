@@ -8,7 +8,7 @@ define([
 ], function(Backbone, Mustache, RecordingsCollection, recordingtemplate, MapView, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#container"),
+    el: $("#content"),
     initialize: function(options) {
       var self = this;
       var showID = options.show_id;

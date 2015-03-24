@@ -7,7 +7,7 @@ define([
 ], function(Backbone, RecordingsCollection, RecordingResultView, MapView, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#container"),
+    el: $("#content"),
     initialize: function(options) {
       var self = this;
       var recordings = new RecordingsCollection([], options);

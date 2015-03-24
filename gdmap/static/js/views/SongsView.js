@@ -7,7 +7,7 @@ define([
 ], function(Backbone, SongsCollection, SongView, MapView, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#container"),
+    el: $("#content"),
     initialize: function(options) {
       var self = this;
       var songs = new SongsCollection([], options);

@@ -6,14 +6,15 @@ define([
   'views/SongView',
   'views/MapView',
   'text!templates/searchwidget.mustache',
-  'text!templates/filtersortwidgets.mustache',
+  'text!templates/filterwidgets.mustache',
+  'text!templates/sortwidgets.mustache',
   'text!templates/paginatewidget.mustache',
   'utils',
 ], function($, Backbone, Mustache, SongsByShowCollection, SongView,
-  MapView, searchwidget, filtersortwidgets, paginatewidget, utils){
+  MapView, searchwidget, filterwidgets, sortwidgets, paginatewidget, utils){
   "use strict";
   return Backbone.View.extend({
-    el: $("#container"),
+    el: $("#content"),
     events: {
       "click .js-search-button": "updateSearchTerms",
       "click .js-sort-date": "toggleSortDate",
@@ -123,7 +124,7 @@ define([
     render: function(){
       var self = this;
 
-      self.$el.html("<h1>Search</h1>");
+      $("#menu").html("<h1>Search</h1>");
 
       // Render the map
       var latlons = utils.modelsLatLons(self.songs.models);
@@ -132,15 +133,19 @@ define([
 
       // Render the search widget
       var searchRendered = Mustache.render(searchwidget, {search_terms: this.options.urlParams.q});
-      self.$el.append(searchRendered);
+      $("#search-bar").html(searchRendered);
 
       // Render the filter widgets
       var filterContext = {
         date_start: this.options.urlParams.date_gte,
         date_end: this.options.urlParams.date_lte
       }
-      var filtersortRendered = Mustache.render(filtersortwidgets, filterContext);
-      self.$el.append(filtersortRendered);
+      var filtersRendered = Mustache.render(filterwidgets, filterContext);
+      $("#filters").html(filtersRendered);
+
+      // Render the sort widgets
+      var sortRendered = Mustache.render(sortwidgets);
+      this.$el.html(sortRendered);
 
       // Render the paginate widget
       var paginateContext = {
