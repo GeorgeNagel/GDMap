@@ -21,12 +21,6 @@ $ git submodule update
 $ vagrant up
 ```
 
-## Create the python virtual environment in the VM and install dependencies
-
-```bash
-$ hostenv/bin/fab reset_virtualenv
-```
-
 ## Create a local settings file
 
 Local settings are not checked into git, as they may contain private keys.
@@ -36,6 +30,13 @@ Create your own settings file in gdmap/settings/local.py
 
 # Put Flask in Debug mode for better error logging
 FLASK_DEBUG = True
+```
+
+## Build the docker image
+```bash
+$ vagrant ssh
+(vagrant box)$ cd gdmap
+(vagrant box)$ sudo docker build -t docker-test .
 ```
 
 ## Get data
@@ -58,7 +59,9 @@ $ hostenv/bin/fab index_songs
 ## Start the server
 
 ```bash
-$ hostenv/bin/fab server
+$ vagrant ssh
+(vagrant box)$ cd gdmap
+(vagrant box)$ sudo docker run -name app-instance --rm -p 0.0.0.0:80:80 -i -t docker-test
 ```
 
 ## Restart your VM
@@ -66,20 +69,4 @@ $ hostenv/bin/fab server
 ```bash
 $ vagrant halt
 $ vagrant up
-```
-
-## If MongoDB gets locked
-
-```bash
-$ vagrant ssh
-$ sudo rm -f /var/lib/mongodb/mongod.lock
-$ sudo service mongodb restart
-```
-
-## Download data for cache
-
-```bash
-$ hostenv/bin/fab download_shows
-$ hostenv/bin/fab download_songs
-$ hostenv/bin/fab index_songs
 ```
