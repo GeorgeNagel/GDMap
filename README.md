@@ -39,6 +39,13 @@ $ vagrant ssh
 (vagrant box)$ sudo docker build -t docker-test .
 ```
 
+## Start the elasticsearch image
+```bash
+$ vagrant ssh
+(vagrant box)$ cd gdmap
+(vagrant box)$ sudo docker run -d -p 127.0.0.1:9200:9200 elasticsearch:1.4.4
+```
+
 ## Get data
 ```bash
 # Download date and venue information from dead.net
