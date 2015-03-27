@@ -16,19 +16,15 @@ RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main universe
 RUN apt-get update
 
 # Install basic applications
-RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
+RUN apt-get install -y tar git curl
 
 # Install Python and Basic Python Tools
-RUN apt-get install -y python python-dev python-distribute python-pip
+RUN apt-get install -y python python-pip
 
-# Copy the application folder inside the container
-ADD /gdmap /gdmap/gdmap
-ADD /data /gdmap/data
-ADD /scripts /gdmap/scripts
+# Add the requirements file
 ADD /requirements.txt /gdmap/requirements.txt
-ADD /server.py /gdmap/server.py
 
-# Get pip to download and install requirements:
+# Use pip to download and install requirements:
 RUN pip install -r /gdmap/requirements.txt
 
 # Expose ports
@@ -42,5 +38,5 @@ ENV PYTHONPATH="/gdmap/gdmap"
 
 # Set the default command to execute    
 # when creating a new container
-# i.e. using CherryPy to serve the application
-CMD python server.py
+# i.e. using gunicorn to serve the application
+CMD ["gunicorn", "--config=gunicorn.py", "gdmap:app"]

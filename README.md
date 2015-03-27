@@ -69,7 +69,7 @@ $ hostenv/bin/fab index_songs
 $ vagrant ssh
 (vagrant box)$ cd gdmap
 # Link the elasticsearch box so that its ip address is in /etc/hosts
-(vagrant box)$ sudo docker run -name app-instance --rm -p 0.0.0.0:80:80 -i -t --link elasticsearch:elasticsearch webapp
+(vagrant box)$ sudo docker run -name app-instance --rm -p 0.0.0.0:80:80 -i -t --link elasticsearch:elasticsearch --volume=/home/vagrant/gdmap:/gdmap:ro webapp
 ```
 
 ## Index the songs
