@@ -4,11 +4,11 @@ import os
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 
-from gdmap.settings import ELASTICSEARCH_INDEX_NAME, DATA_DIRECTORY, logging
+from gdmap.settings import ELASTICSEARCH_INDEX_NAME, DATA_DIRECTORY, ELASTICSEARCH_HOST_NAME, logging
 
 log = logging.getLogger(__name__)
 
-es = Elasticsearch()
+es = Elasticsearch([ELASTICSEARCH_HOST_NAME], port=9200)
 
 SONG_MAPPINGS = {
     "mappings": {

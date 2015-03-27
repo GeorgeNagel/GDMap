@@ -21,12 +21,6 @@ $ git submodule update
 $ vagrant up
 ```
 
-## Create the python virtual environment in the VM and install dependencies
-
-```bash
-$ hostenv/bin/fab reset_virtualenv
-```
-
 ## Create a local settings file
 
 Local settings are not checked into git, as they may contain private keys.
@@ -36,6 +30,13 @@ Create your own settings file in gdmap/settings/local.py
 
 # Put Flask in Debug mode for better error logging
 FLASK_DEBUG = True
+```
+
+## Build the docker image
+```bash
+$ vagrant ssh
+(vagrant box)$ cd gdmap
+(vagrant box)$ sudo docker build -t webapp .
 ```
 
 ## Get data
@@ -52,13 +53,30 @@ $ hostenv/bin/fab download_shows
 $ hostenv/bin/fab download_songs
 # Download songs from only some years
 $ hostenv/bin/fab download_songs:1967,1968
-$ hostenv/bin/fab index_songs
+```
+
+## Start the elasticsearch image
+
+```bash
+$ vagrant ssh
+(vagrant box)$ cd gdmap
+(vagrant box)$ sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2
 ```
 
 ## Start the server
 
 ```bash
-$ hostenv/bin/fab server
+$ vagrant ssh
+(vagrant box)$ cd gdmap
+# Link the elasticsearch box so that its ip address is in /etc/hosts
+(vagrant box)$ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --volume=/home/vagrant/gdmap:/gdmap:ro webapp
+```
+
+## Index the songs
+
+```bash
+$ vagrant ssh
+(vagrant box)$ sudo docker exec -t -i app-instance python -m gdmap.es_index
 ```
 
 ## Restart your VM
@@ -66,20 +84,4 @@ $ hostenv/bin/fab server
 ```bash
 $ vagrant halt
 $ vagrant up
-```
-
-## If MongoDB gets locked
-
-```bash
-$ vagrant ssh
-$ sudo rm -f /var/lib/mongodb/mongod.lock
-$ sudo service mongodb restart
-```
-
-## Download data for cache
-
-```bash
-$ hostenv/bin/fab download_shows
-$ hostenv/bin/fab download_songs
-$ hostenv/bin/fab index_songs
 ```
