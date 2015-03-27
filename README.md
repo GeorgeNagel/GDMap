@@ -36,14 +36,14 @@ FLASK_DEBUG = True
 ```bash
 $ vagrant ssh
 (vagrant box)$ cd gdmap
-(vagrant box)$ sudo docker build -t docker-test .
+(vagrant box)$ sudo docker build -t webapp .
 ```
 
 ## Start the elasticsearch image
 ```bash
 $ vagrant ssh
 (vagrant box)$ cd gdmap
-(vagrant box)$ sudo docker run -d -p 127.0.0.1:9200:9200 elasticsearch:1.4.4
+(vagrant box)$ sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2
 ```
 
 ## Get data
@@ -68,7 +68,15 @@ $ hostenv/bin/fab index_songs
 ```bash
 $ vagrant ssh
 (vagrant box)$ cd gdmap
-(vagrant box)$ sudo docker run -name app-instance --rm -p 0.0.0.0:80:80 -i -t docker-test
+# Link the elasticsearch box so that its ip address is in /etc/hosts
+(vagrant box)$ sudo docker run -name app-instance --rm -p 0.0.0.0:80:80 -i -t --link elasticsearch:elasticsearch webapp
+```
+
+## Index the songs
+
+```bash
+$ vagrant ssh
+(vagrant box)$ sudo docker exec app-instance python es_index.py
 ```
 
 ## Restart your VM
