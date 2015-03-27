@@ -39,13 +39,6 @@ $ vagrant ssh
 (vagrant box)$ sudo docker build -t webapp .
 ```
 
-## Start the elasticsearch image
-```bash
-$ vagrant ssh
-(vagrant box)$ cd gdmap
-(vagrant box)$ sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2
-```
-
 ## Get data
 ```bash
 # Download date and venue information from dead.net
@@ -60,7 +53,14 @@ $ hostenv/bin/fab download_shows
 $ hostenv/bin/fab download_songs
 # Download songs from only some years
 $ hostenv/bin/fab download_songs:1967,1968
-$ hostenv/bin/fab index_songs
+```
+
+## Start the elasticsearch image
+
+```bash
+$ vagrant ssh
+(vagrant box)$ cd gdmap
+(vagrant box)$ sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2
 ```
 
 ## Start the server
@@ -69,14 +69,14 @@ $ hostenv/bin/fab index_songs
 $ vagrant ssh
 (vagrant box)$ cd gdmap
 # Link the elasticsearch box so that its ip address is in /etc/hosts
-(vagrant box)$ sudo docker run -name app-instance --rm -p 0.0.0.0:80:80 -i -t --link elasticsearch:elasticsearch --volume=/home/vagrant/gdmap:/gdmap:ro webapp
+(vagrant box)$ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --volume=/home/vagrant/gdmap:/gdmap:ro webapp
 ```
 
 ## Index the songs
 
 ```bash
 $ vagrant ssh
-(vagrant box)$ sudo docker exec app-instance python es_index.py
+(vagrant box)$ sudo docker exec -t -i app-instance python -m gdmap.es_index
 ```
 
 ## Restart your VM
