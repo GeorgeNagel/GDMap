@@ -1,9 +1,9 @@
 from mongoengine import Document, fields, connect
 
-from gdmap.settings import MONGO_DATABASE_NAME
+from gdmap.settings import MONGO_DATABASE_NAME, MONGODB_HOST_NAME
 
 # Establish the connection to the database
-connect(MONGO_DATABASE_NAME)
+connect(MONGO_DATABASE_NAME, host=MONGODB_HOST_NAME)
 
 
 class Song(Document):

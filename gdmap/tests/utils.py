@@ -7,10 +7,10 @@ from mongoengine import connect
 
 from gdmap import app
 from gdmap.es_index import recreate_index
-from gdmap.settings import MONGO_DATABASE_NAME, MONGO_CACHE_NAME
+from gdmap.settings import MONGO_DATABASE_NAME, MONGO_CACHE_NAME, MONGODB_HOST_NAME
 
-db = connect(MONGO_DATABASE_NAME)
-cache_db = connect(MONGO_CACHE_NAME)
+db = connect(MONGO_DATABASE_NAME, host=MONGODB_HOST_NAME)
+cache_db = connect(MONGO_CACHE_NAME, host=MONGODB_HOST_NAME)
 
 
 def mongo_clean(f):

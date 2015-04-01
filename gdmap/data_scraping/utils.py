@@ -1,13 +1,16 @@
 import logging
 import requests
 
+from pymongo import Connection
 import requests_cache
 
-from gdmap.settings import CACHE_EXPIRATION_SECONDS
+from gdmap.settings import CACHE_EXPIRATION_SECONDS, MONGO_CACHE_NAME, MONGODB_HOST_NAME, MONGODB_PORT
 
-requests_cache.install_cache('cache',
+connection = Connection(MONGODB_HOST_NAME, MONGODB_PORT)
+requests_cache.install_cache(cache_name=MONGO_CACHE_NAME,
                              backend='mongo',
-                             expire_after=CACHE_EXPIRATION_SECONDS)
+                             expire_after=CACHE_EXPIRATION_SECONDS,
+                             connection=connection)
 cache = requests_cache.core.get_cache()
 
 
