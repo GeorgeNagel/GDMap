@@ -75,7 +75,7 @@ $ vagrant ssh
 $ vagrant ssh
 (vagrant box)$ cd gdmap
 # Link the elasticsearch box so that its ip address is in /etc/hosts
-(vagrant box)$ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --link mongodb:mongodb --volume=/home/vagrant/gdmap:/gdmap:ro webapp
+(vagrant box)$ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --link mongodb:mongodb --volume=/home/vagrant/gdmap:/gdmap webapp
 ```
 
 ## Run the tests
@@ -83,6 +83,18 @@ $ vagrant ssh
 ```bash
 $ vagrant ssh
 (vagrant box)$ sudo docker exec app-instance nosetests /gdmap/gdmap
+```
+
+## Push up data to s3
+
+```bash
+$ fab upload_to_s3
+```
+
+## Download data from s3
+
+```bash
+$ fab download_from_s3
 ```
 
 ## Index the songs
