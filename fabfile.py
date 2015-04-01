@@ -61,12 +61,11 @@ def index_songs():
 def test(*args):
     """Run the unit tests."""
     with cd('gdmap'):
-        with shell_env(TESTING='1'):
-            # If you don't supply a specific test to run, run on the project
-            if not args:
-                args = 'gdmap'
-            run('virtualenv/bin/nosetests %s -s' % args)
-            run('virtualenv/bin/flake8 gdmap')
+        # If you don't supply a specific test to run, run on the project
+        if not args:
+            args = 'gdmap'
+        run('sudo docker exec app-instance env TESTING=1 nosetests /gdmap/gdmap %s -s' % args)
+        run('sudo docker exec app-instance env TESTING=1 flake8 gdmap')
 
 
 @task

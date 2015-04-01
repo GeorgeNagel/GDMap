@@ -22,24 +22,6 @@ class SongsByShowAPITestCase(APITestCase):
             {
                 u'songs_by_show': [
                     {
-                        u'show': u'1990-03-25 - Knickerbocker Arena',
-                        u'songs': [
-                            {
-                                u'_id': u'917c5b38b870625994a003ca2beed5e4ab45f5f4',
-                                u'album': u'1990-03-25 - Knickerbocker Arena',
-                                u'date': u'1990-03-25',
-                                u'filename': u'gd90-03-25MTd2t03.shn',
-                                u'latlon': u'42.6525793,-73.7562317',
-                                u'location': u'Albany, NY',
-                                u'show_id': u'gd1990-03-25.sbd.hollister.7508.shnf',
-                                u'title': u'Crazy Fingers',
-                                u'track': 11,
-                                u'venue': u'Knickerbocker Arena'
-                            }
-                        ],
-                        u'total': 1
-                    },
-                    {
                         u'show': u'1990-03-19 - Civic Center',
                         u'songs': [
                             {
@@ -56,6 +38,24 @@ class SongsByShowAPITestCase(APITestCase):
                             }
                         ],
                         u'total': 2
+                    },
+                    {
+                        u'show': u'1990-03-25 - Knickerbocker Arena',
+                        u'songs': [
+                            {
+                                u'_id': u'917c5b38b870625994a003ca2beed5e4ab45f5f4',
+                                u'album': u'1990-03-25 - Knickerbocker Arena',
+                                u'date': u'1990-03-25',
+                                u'filename': u'gd90-03-25MTd2t03.shn',
+                                u'latlon': u'42.6525793,-73.7562317',
+                                u'location': u'Albany, NY',
+                                u'show_id': u'gd1990-03-25.sbd.hollister.7508.shnf',
+                                u'title': u'Crazy Fingers',
+                                u'track': 11,
+                                u'venue': u'Knickerbocker Arena'
+                            }
+                        ],
+                        u'total': 1
                     }
                 ],
                 u'total': 2,

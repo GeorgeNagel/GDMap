@@ -10,7 +10,7 @@ from gdmap.data_scraping.geocode_show_listings import geocoding_dict
 from gdmap.data_scraping.utils import json_request, APIException
 from gdmap.data_scraping.archive_api.download_shows import show_identifiers
 from gdmap.models import Song
-from gdmap.settings import MONGO_DATABASE_NAME, DATA_DIRECTORY, logging
+from gdmap.settings import MONGO_DATABASE_NAME, DATA_DIRECTORY, MONGODB_HOST_NAME, logging
 
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ base_url = 'https://archive.org/details'
 
 
 # Establish the connection to the database
-connect(MONGO_DATABASE_NAME)
+connect(MONGO_DATABASE_NAME, host=MONGODB_HOST_NAME)
 
 # A mapping of dates to venues to latitudes and longitudes
 geo_dict = geocoding_dict()
