@@ -111,3 +111,21 @@ def geocode_listings():
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
             run('virtualenv/bin/python gdmap/data_scraping/geocode_show_listings.py')
+
+
+@task
+@hosts([host])
+def upload_to_s3():
+    """Upload songs files to s3."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('sudo docker exec app-instance python -m gdmap.s3.songs_to_s3')
+
+
+@task
+@hosts([host])
+def download_from_s3():
+    """Download songs files from s3."""
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('sudo docker exec app-instance python -m gdmap.s3.songs_from_s3')

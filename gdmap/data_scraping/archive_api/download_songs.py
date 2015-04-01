@@ -10,7 +10,7 @@ from gdmap.data_scraping.geocode_show_listings import geocoding_dict
 from gdmap.data_scraping.utils import json_request, APIException
 from gdmap.data_scraping.archive_api.download_shows import show_identifiers
 from gdmap.models import Song
-from gdmap.settings import MONGO_DATABASE_NAME, DATA_DIRECTORY, MONGODB_HOST_NAME, logging
+from gdmap.settings import MONGO_DATABASE_NAME, SONGS_DIRECTORY, MONGODB_HOST_NAME, logging
 
 
 log = logging.getLogger(__name__)
@@ -153,10 +153,9 @@ def download_songs(year, crawl_delay_seconds=1, max_errors=10, **kwargs):
 
 def dump_songs_json(year):
     """Dump all of the songs in a given year to a JSON file."""
-    songs_directory = os.path.join(DATA_DIRECTORY, 'songs')
-    if not os.path.exists(songs_directory):
-        os.makedirs(songs_directory)
-    songs_filename = os.path.join(songs_directory, "%s.jl" % year)
+    if not os.path.exists(SONGS_DIRECTORY):
+        os.makedirs(SONGS_DIRECTORY)
+    songs_filename = os.path.join(SONGS_DIRECTORY, "%s.jl" % year)
     year_string = str(year)
     next_year_string = str(year+1)
     with open(songs_filename, 'w') as fout:
