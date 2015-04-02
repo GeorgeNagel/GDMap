@@ -76,6 +76,9 @@ $ vagrant ssh
 (vagrant box)$ cd gdmap
 # Link the elasticsearch box so that its ip address is in /etc/hosts
 (vagrant box)$ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --link mongodb:mongodb --volume=/home/vagrant/gdmap:/gdmap webapp
+
+# When deploying to production, mount the volume wherever the git repo was cloned, e.g.
+$ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --link mongodb:mongodb --volume=/usr/local/src/gdmap:/gdmap webapp
 ```
 
 ## Run the tests

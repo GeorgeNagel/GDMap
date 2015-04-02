@@ -188,6 +188,35 @@ class SongsAPITestCase(APITestCase):
             }
         )
 
+    @index_clean
+    def test_and_terms(self):
+        """Multiple search terms should further restrict results."""
+        self.maxDiff = None
+        index_songs(1990)
+        # Wait for the song to be indexed
+        time.sleep(2)
+        response = self.app.get('/api/songs/?q=Civic Run')
+        self.assertEqual(
+            json.loads(response.data),
+            {
+                u'songs': [
+                    {
+                        u'_id': u'4ebd25dad72908f3fa370d9b9ea29fb6d82f9e1b',
+                        u'album': u'1990-03-19 - Civic Center',
+                        u'date': u'1990-03-19',
+                        u'filename': u'gd1990-03-19d1t04.flac',
+                        u'latlon': u'41.7654588,-72.67215399999999',
+                        u'location': u'Hartford , CT',
+                        u'show_id': u'gd1990-03-19.nak300.carpenter.andrewf.86825.sbeok.flac16',
+                        u'title': u'We Can Run',
+                        u'track': 4,
+                        u'venue': u'Civic Center'
+                    }
+                ],
+                u'total': 1
+            }
+        )
+
     def test_400_invalid_sort(self):
         response = self.app.get('/api/songs/?sort=toast')
         self.assertEqual(response.status, '400 BAD REQUEST')

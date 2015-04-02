@@ -157,7 +157,13 @@ def _build_multi_field_query(phrase):
             "fields": [
                 "sha1", "show_id", "filename",
                 "album", "title", "location"
-            ]
+            ],
+            # Use AND to prevent "Me and My Uncle" from showing up
+            # in "Uncle John's Band" searches
+            "operator": "and",
+            # Perform the AND operation across fields, so that searches
+            # like "Cassidy Arena" can match against title and venue
+            "type": "cross_fields"
         }
     }
 
