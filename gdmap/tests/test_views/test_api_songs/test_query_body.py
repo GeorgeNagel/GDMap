@@ -69,7 +69,9 @@ class BuildQueryBodyTestCase(TestCase):
                             'sha1', 'show_id', 'filename',
                             'album', 'title', 'location'
                         ],
-                        'query': 'miss'
+                        'query': 'miss',
+                        'operator': 'and',
+                        'type': 'cross_fields'
                     }
                 }
             }
@@ -167,7 +169,9 @@ class BuildQueryBodyTestCase(TestCase):
                                         'sha1', 'show_id', 'filename',
                                         'album', 'title', 'location'
                                     ],
-                                    'query': 'diplo'
+                                    'query': 'diplo',
+                                    'operator': 'and',
+                                    'type': 'cross_fields'
                                 }
                             }
                         ]
@@ -209,7 +213,9 @@ class BuildMultiFieldQueryTestCase(TestCase):
                         'sha1', 'show_id', 'filename',
                         'album', 'title', 'location'
                     ],
-                    'query': 'miss'
+                    'query': 'miss',
+                    'operator': 'and',
+                    'type': 'cross_fields'
                 }
             }
         )
