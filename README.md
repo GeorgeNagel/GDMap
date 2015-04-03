@@ -8,12 +8,6 @@ $ virtualenv hostenv
 # Install the python requirements
 $ hostenv/bin/pip install -r requirements_host.txt
 ```
-## Install the [git submodules](http://www.git-scm.com/book/en/v2/Git-Tools-Submodules)
-
-```bash
-$ git submodule init
-$ git submodule update
-```
 
 ## Setup the vagrant box
 
