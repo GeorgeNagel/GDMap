@@ -47,12 +47,6 @@ $ hostenv/bin/fab download_songs
 $ hostenv/bin/fab download_songs:1967,1968
 ```
 
-## Start the elasticsearch image
-
-```bash
-$ hostenv/bin/fab start_es
-```
-
 ## Start the server
 
 ```bash
