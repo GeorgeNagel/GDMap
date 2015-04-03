@@ -11,14 +11,6 @@ host = 'vagrant@127.0.0.1:2000'
 
 @task
 @hosts([host])
-def reset_virtualenv():
-    """Reset the python virtualenv."""
-    with cd('gdmap'):
-        run('sh reset_virtualenv.sh')
-
-
-@task
-@hosts([host])
 def clean():
     """Remove .pyc files."""
     run("find gdmap -name '*.pyc' -delete")
@@ -26,26 +18,72 @@ def clean():
 
 @task
 @hosts([host])
-def restart_mongo():
-    """Restart the mongo service."""
-    run('sudo rm -f /var/lib/mongodb/mongod.lock')
-    run('sudo service mongodb restart')
+def setup():
+    """Set up the containers."""
+    start_es()
+    start_mongo()
+    build_app()
 
 
 @task
 @hosts([host])
-def download_shows(crawl_delay=1):
+def start_es():
+    """Star the elasticsearch container."""
     with cd('gdmap'):
-        with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/data_scraping/archive_api/download_shows.py %s' % crawl_delay)
+        run("sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2")
 
 
 @task
 @hosts([host])
-def download_songs(*years):
+def start_mongo():
+    """Star the mongodb container."""
+    with cd('gdmap'):
+        run("sudo docker run -d -p 27017:27017 --name mongodb dockerfile/mongodb")
+
+
+@task
+@hosts([host])
+def build_app():
+    """Build the webapp container."""
+    with cd('gdmap'):
+        run("sudo docker build -t webapp .")
+
+
+@task
+@hosts([host])
+def server():
+    """Start the webapp server."""
+    with cd('gdmap'):
+        run(
+            "sudo docker run --name app-instance -d -p 0.0.0.0:80:80"
+            " --link elasticsearch:elasticsearch --link mongodb:mongodb"
+            " --volume=/home/vagrant/gdmap:/gdmap webapp"
+        )
+
+
+@task
+@hosts([host])
+def docker_cleanup():
+    """Remove all running docker containers."""
+    run("sudo docker rm -f app-instance || echo No running app-instance container")
+    run("sudo docker rm -f mongodb || echo No running mongodb container")
+    run("sudo docker rm -f elasticsearch || echo No running elasticsearch container")
+
+
+@task
+@hosts([host])
+def download_shows():
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/data_scraping/archive_api/download_songs.py %s' % ' '.join(years))
+            run('sudo docker exec -t -i app-instance python -m gdmap.data_scraping.archive_api.download_shows')
+
+
+@task
+@hosts([host])
+def download_songs():
+    with cd('gdmap'):
+        with shell_env(PYTHONPATH=env.gdmap_path):
+            run('sudo docker exec -t -i app-instance python -m gdmap.data_scraping.archive_api.download_songs')
 
 
 @task
@@ -53,7 +91,7 @@ def download_songs(*years):
 def index_songs():
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/es_index.py')
+            run('sudo docker exec -t -i app-instance python -m gdmap.es_index')
 
 
 @task
@@ -70,29 +108,11 @@ def test(*args):
 
 @task
 @hosts([host])
-def server():
-    """Run the server."""
-    with cd('gdmap'):
-        with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/run_server.py')
-
-
-@task
-@hosts([host])
-def locations_from_mongo():
-    """Generate a list of locations from songs in mongo."""
-    with cd('gdmap'):
-        with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python scripts/locations_from_mongo.py')
-
-
-@task
-@hosts([host])
 def download_show_listings():
     """Generate the list of locations."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/data_scraping/dead_net/download_show_listings.py')
+            run('sudo docker exec -t -i app-instance python -m gdmap.data_scraping.dead_net.download_show_listings')
 
 
 @task
@@ -101,7 +121,7 @@ def geocode_locations():
     """Geocode the list of locations."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/data_scraping/geocode.py')
+            run('sudo docker exec -t -i app-instance python -m gdmap.data_scraping.geocode')
 
 
 @task
@@ -110,7 +130,7 @@ def geocode_listings():
     """Geocode the listings from dead.net."""
     with cd('gdmap'):
         with shell_env(PYTHONPATH=env.gdmap_path):
-            run('virtualenv/bin/python gdmap/data_scraping/geocode_show_listings.py')
+            run('sudo docker exec -t -i app-instance python -m gdmap.data_scraping.geocode_show_listings')
 
 
 @task

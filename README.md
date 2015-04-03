@@ -8,12 +8,6 @@ $ virtualenv hostenv
 # Install the python requirements
 $ hostenv/bin/pip install -r requirements_host.txt
 ```
-## Install the [git submodules](http://www.git-scm.com/book/en/v2/Git-Tools-Submodules)
-
-```bash
-$ git submodule init
-$ git submodule update
-```
 
 ## Setup the vagrant box
 
@@ -32,17 +26,9 @@ Create your own settings file in gdmap/settings/local.py
 FLASK_DEBUG = True
 ```
 
-## Build the docker image
+## Create the docker containers
 ```bash
-$ vagrant ssh
-(vagrant box)$ cd gdmap
-(vagrant box)$ sudo docker build -t webapp .
-```
-
-## Start mongodb
-```bash
-$ vagrant ssh
-(vagrant box)$ sudo docker run -d -p 27017:27017 --name mongodb dockerfile/mongodb
+$ hostenv/bin/fab setup
 ```
 
 ## Get data
@@ -64,18 +50,13 @@ $ hostenv/bin/fab download_songs:1967,1968
 ## Start the elasticsearch image
 
 ```bash
-$ vagrant ssh
-(vagrant box)$ cd gdmap
-(vagrant box)$ sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2
+$ hostenv/bin/fab start_es
 ```
 
 ## Start the server
 
 ```bash
-$ vagrant ssh
-(vagrant box)$ cd gdmap
-# Link the elasticsearch box so that its ip address is in /etc/hosts
-(vagrant box)$ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --link mongodb:mongodb --volume=/home/vagrant/gdmap:/gdmap webapp
+$ hostenv/bin/fab server
 
 # When deploying to production, mount the volume wherever the git repo was cloned, e.g.
 $ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:elasticsearch --link mongodb:mongodb --volume=/usr/local/src/gdmap:/gdmap webapp
@@ -84,27 +65,25 @@ $ sudo docker run --name app-instance -d -p 0.0.0.0:80:80 --link elasticsearch:e
 ## Run the tests
 
 ```bash
-$ vagrant ssh
-(vagrant box)$ sudo docker exec app-instance nosetests /gdmap/gdmap
+$ hostenv/bin/fab test
 ```
 
 ## Push up data to s3
 
 ```bash
-$ fab upload_to_s3
+$ hostenv/bin/fab upload_to_s3
 ```
 
 ## Download data from s3
 
 ```bash
-$ fab download_from_s3
+$ hostenv/bin/fab download_from_s3
 ```
 
 ## Index the songs
 
 ```bash
-$ vagrant ssh
-(vagrant box)$ sudo docker exec -t -i app-instance python -m gdmap.es_index
+$ hostenv/bin/fab index_songs
 ```
 
 ## Restart your VM
@@ -112,4 +91,10 @@ $ vagrant ssh
 ```bash
 $ vagrant halt
 $ vagrant up
+```
+
+## Close all running docker containers
+
+```bash
+$ hostenv/bin/fab docker_cleanup
 ```
