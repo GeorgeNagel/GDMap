@@ -84,7 +84,10 @@ define([
     // Use router.navigate for all urls
     // http://stackoverflow.com/questions/9328513/backbone-js-and-pushstate
     $(document).on('click', 'a:not([data-bypass])', function (evt) {
-
+      // Let the browser handle cmd-clicks, etc.
+      if (evt.metaKey || evt.ctrlKey || evt.shiftKey) {
+        return;
+      }
       var href = $(this).attr('href');
       var protocol = this.protocol + '//';
 
