@@ -47,6 +47,14 @@ $ hostenv/bin/fab download_songs
 $ hostenv/bin/fab download_songs:1967,1968
 ```
 
+## Start the development server
+
+Use this when altering static/template files.
+
+```bash
+$ hostenv/bin/fab dev_server
+```
+
 ## Start the server
 
 ```bash
