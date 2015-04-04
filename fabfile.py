@@ -63,6 +63,19 @@ def server():
 
 @task
 @hosts([host])
+def dev_server():
+    """Start the flask development webapp server."""
+    with cd('gdmap'):
+        run(
+            "sudo docker run --name app-instance -d -p 0.0.0.0:80:80"
+            " --link elasticsearch:elasticsearch --link mongodb:mongodb"
+            " --volume=/home/vagrant/gdmap:/gdmap webapp"
+            " python dev_server.py"
+        )
+
+
+@task
+@hosts([host])
 def docker_cleanup():
     """Remove all running docker containers."""
     run("sudo docker rm -f app-instance || echo No running app-instance container")
