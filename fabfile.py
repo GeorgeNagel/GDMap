@@ -22,6 +22,8 @@ def setup():
     """Set up the containers."""
     start_es()
     start_mongo()
+    start_nginx()
+    start_docker_gen()
     build_app()
 
 
@@ -43,10 +45,26 @@ def start_mongo():
 
 @task
 @hosts([host])
+def start_nginx():
+    """Start the nginx reverse-proxy container."""
+    with cd('gdmap'):
+        run("source scripts/start_nginx.sh")
+
+
+@task
+@hosts([host])
+def start_docker_gen():
+    """Start the service to generate nginx configuration files."""
+    with cd('gdmap'):
+        run("source scripts/start_docker_gen.sh")
+
+
+@task
+@hosts([host])
 def build_app():
     """Build the webapp container."""
     with cd('gdmap'):
-        run("sudo docker build -t webapp .")
+        run("sudo docker build -t webapp -f docker/webapp/Dockerfile .")
 
 
 @task
@@ -55,9 +73,10 @@ def server():
     """Start the webapp server."""
     with cd('gdmap'):
         run(
-            "sudo docker run --name app-instance -d -p 0.0.0.0:80:80"
+            "sudo docker run --name app-instance -d -P"
             " --link elasticsearch:elasticsearch --link mongodb:mongodb"
-            " --volume=/home/vagrant/gdmap:/gdmap webapp"
+            " -e VIRTUAL_HOST=localhost"
+            " --volume=$(pwd):/gdmap webapp"
         )
 
 
@@ -69,7 +88,7 @@ def dev_server():
         run(
             "sudo docker run --name app-instance -d -p 0.0.0.0:80:80"
             " --link elasticsearch:elasticsearch --link mongodb:mongodb"
-            " --volume=/home/vagrant/gdmap:/gdmap webapp"
+            " --volume=$(pwd):/gdmap webapp"
             " python dev_server.py"
         )
 
@@ -78,9 +97,25 @@ def dev_server():
 @hosts([host])
 def docker_cleanup():
     """Remove all running docker containers."""
-    run("sudo docker rm -f app-instance || echo No running app-instance container")
-    run("sudo docker rm -f mongodb || echo No running mongodb container")
-    run("sudo docker rm -f elasticsearch || echo No running elasticsearch container")
+    remove_container('nginx')
+    remove_container('docker-gen')
+    remove_container('app-instance')
+    remove_container('mongodb')
+    remove_container('elasticsearch')
+
+
+@task
+@hosts([host])
+def remove_container(container):
+    """Remove the specified container."""
+    run("sudo docker rm -f {0} || echo No running {0} container".format(container))
+
+
+@task
+@hosts([host])
+def docker_ps():
+    """List all containers."""
+    run("sudo docker ps -a")
 
 
 @task
