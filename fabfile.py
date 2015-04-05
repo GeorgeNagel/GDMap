@@ -48,12 +48,7 @@ def start_mongo():
 def start_nginx():
     """Start the nginx reverse-proxy container."""
     with cd('gdmap'):
-        run(
-            "sudo docker run -d -p 80:80"
-            " --name nginx -v /tmp/nginx:/etc/nginx/conf.d"
-            " -v $(pwd)/gdmap/static:/data/static"
-            " -t nginx"
-        )
+        run("source scripts/start_nginx.sh")
 
 
 @task
@@ -61,15 +56,7 @@ def start_nginx():
 def start_docker_gen():
     """Start the service to generate nginx configuration files."""
     with cd('gdmap'):
-        run(
-            "sudo docker run -d --volumes-from nginx"
-            " --name docker-gen"
-            " -v /var/run/docker.sock:/tmp/docker.sock"
-            " -v $(pwd)/docker/nginx:/etc/docker-gen/templates"
-            " -t jwilder/docker-gen -notify-sighup nginx -watch -only-published"
-            " /etc/docker-gen/templates/nginx.tmpl"
-            " /etc/nginx/conf.d/default.conf"
-        )
+        run("source scripts/start_docker_gen.sh")
 
 
 @task
