@@ -79,6 +79,8 @@ define([
           this.options.urlParams.sort_order = "asc";
         }
       }
+      // Reset page number
+      this.options.urlParams.page = 1;
       this.navigateFromURLParams(this.options.urlParams);
     },
     previousPage: function() {
@@ -148,7 +150,17 @@ define([
       $("#filters").html(filtersRendered);
 
       // Render the sort widgets
-      var sortRendered = Mustache.render(sortwidgets);
+      var date_sort = this.options.urlParams.sort === "date";
+      var relevance_sort = this.options.urlParams.sort === "relevance";
+      var sort_asc = this.options.urlParams.sort_order === "asc";
+      var sort_desc = this.options.urlParams.sort_order === "desc";
+      var sort_context = {
+        date_sort: date_sort,
+        relevance_sort: relevance_sort,
+        sort_asc: sort_asc,
+        sort_desc: sort_desc
+      }
+      var sortRendered = Mustache.render(sortwidgets, sort_context);
       $("#sort").html(sortRendered);
 
       // Render the paginate widget
