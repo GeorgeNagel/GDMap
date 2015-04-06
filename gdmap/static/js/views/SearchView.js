@@ -57,6 +57,10 @@ define([
       var dateEndEl = $(".js-filter-date-end");
       var dateEndText = dateEndEl.val();
       this.options.urlParams.date_lte = dateEndText;
+
+      // Don't preserve page number between searches.
+      delete this.options.urlParams.page;
+
       // Navigate to the new URL
       this.navigateFromURLParams(this.options.urlParams);
     },
