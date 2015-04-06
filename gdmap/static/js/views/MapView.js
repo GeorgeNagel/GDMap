@@ -18,6 +18,10 @@ define([
       }
       var map = new google.maps.Map(this.el, mapOptions);
 
+      // Track the bounds of the markers
+      // http://stackoverflow.com/questions/15719951/google-maps-api-v3-auto-center-map-with-multiple-markers
+      var bounds = new google.maps.LatLngBounds();
+
       $.each(this.latlons, function(index, latlon) {
         var position = new google.maps.LatLng(latlon[0], latlon[1]);
         var marker = new google.maps.Marker({
@@ -25,7 +29,12 @@ define([
             map: map,
             title: 'Hello World!'
         });
+        //extend the bounds to include each marker's position
+        bounds.extend(marker.position);
       });
+
+      //now fit the map to the newly inclusive bounds
+      map.fitBounds(bounds);
     }
   })
 })
