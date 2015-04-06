@@ -29,12 +29,21 @@ define([
             map: map,
             title: 'Hello World!'
         });
-        //extend the bounds to include each marker's position
+        // Extend the bounds to include each marker's position
         bounds.extend(marker.position);
       });
 
-      //now fit the map to the newly inclusive bounds
+      // Now fit the map to the newly inclusive bounds
       map.fitBounds(bounds);
+      // Set a max zoom level after the map is done scaling
+      var listener = google.maps.event.addListener(map, "idle", function () {
+        var currentZoom = map.getZoom();
+        var maxZoom = 5;
+        if (currentZoom > maxZoom) {
+          map.setZoom(maxZoom);
+        }
+        google.maps.event.removeListener(listener);
+      });
     }
   })
 })
