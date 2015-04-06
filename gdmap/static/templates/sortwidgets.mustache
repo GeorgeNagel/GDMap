@@ -1,5 +1,5 @@
 <div class="pull-right">
   <span>Sort by:</span>
-  <button class="btn btn-sm js-sort-date">Date</button>
-  <button class="btn btn-sm js-sort-relevance">Relevance</button>
+  <button class="btn btn-sm js-sort-date">{{# date_sort }}{{# sort_asc }}<i class="fa fa-caret-up"></i>{{/ sort_asc }}{{# sort_desc }}<i class="fa fa-caret-down"></i>{{/ sort_desc }}{{/ date_sort }}Date</button>
+  <button class="btn btn-sm js-sort-relevance">{{# relevance_sort }}{{# sort_asc }}<i class="fa fa-caret-up"></i>{{/ sort_asc }}{{# sort_desc }}<i class="fa fa-caret-down"></i>{{/ sort_desc }}{{/ relevance_sort }}Relevance</button>
 </div>

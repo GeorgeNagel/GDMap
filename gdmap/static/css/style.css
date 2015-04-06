@@ -6,3 +6,6 @@
   background-color: #EEE;
   margin-top: 5px;
 }
+button i {
+  padding-right: 10px;
+}
