@@ -119,13 +119,21 @@ $ hostenv/bin/fab docker_cleanup
     $ apt-get install git
     ```
 
-3. Install docker
+3. Clone the repo
+    
+    ```bash
+    $ cd /usr/local/src
+    $ git clone https://gsusmobile@bitbucket.org/gsusmobile/gdmap.git
+    $ cd gdmap
+    ```
+
+4. Install docker
     
     ```bash
     $ /bin/bash provision.sh
     ```
 
-4. Setup containers
+5. Setup containers
 
     ```bash
     $ sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2
@@ -134,26 +142,31 @@ $ hostenv/bin/fab docker_cleanup
     $ source scripts/start_docker_gen.sh
     ```
 
-5. Build the webapp
+6. Build the webapp
 
     ```bash
     $ sudo docker build -t webapp -f docker/webapp/Dockerfile .
     ```
 
-6. Create local settings file with AWS credentials
-7. Start the webapp
+7. Create local settings file with AWS credentials
+
+    ```bash
+    $ vim gdmap/settings/local.py
+    ```
+
+8. Start the webapp
 
     ```bash
     $ sudo docker run --name app1 -d -P --link elasticsearch:elasticsearch --link mongodb:mongodb -e VIRTUAL_HOST=www.goldenroadmap.com --volume=$(pwd):/gdmap webapp
     ```
 
-8. Pull data from S3
+9. Pull data from S3
 
     ```bash
-    $ sudo docker exec app1 -m gdmap.s3.songs_from_s3
+    $ sudo docker exec app1 python -m gdmap.s3.songs_from_s3
     ```
 
-9. Index the songs
+10. Index the songs
 
     ```bash
     $ sudo docker exec -t -i app1 python -m gdmap.es_index
