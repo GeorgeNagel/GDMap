@@ -136,8 +136,8 @@ $ hostenv/bin/fab docker_cleanup
 5. Setup containers
 
     ```bash
-    $ sudo docker run -d --name elasticsearch -p 9200:9200 elasticsearch:1.4.2
-    $ sudo docker run -d -p 27017:27017 --name mongodb dockerfile/mongodb
+    $ sudo docker run -d --name elasticsearch elasticsearch:1.4.2
+    $ sudo docker run -d --name mongodb dockerfile/mongodb
     $ source scripts/start_nginx.sh
     $ source scripts/start_docker_gen.sh
     ```
@@ -157,7 +157,7 @@ $ hostenv/bin/fab docker_cleanup
 8. Start the webapp
 
     ```bash
-    $ sudo docker run --name app1 -d -P --link elasticsearch:elasticsearch --link mongodb:mongodb -e VIRTUAL_HOST=www.goldenroadmap.com --volume=$(pwd):/gdmap webapp
+    $ sudo docker run --name app1 -d --link elasticsearch:elasticsearch --link mongodb:mongodb -e VIRTUAL_HOST=www.goldenroadmap.com --volume=$(pwd):/gdmap webapp
     ```
 
 9. Pull data from S3
