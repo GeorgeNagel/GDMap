@@ -22,8 +22,6 @@ def setup():
     """Set up the containers."""
     start_es()
     start_mongo()
-    start_nginx()
-    start_docker_gen()
     build_app()
 
 
@@ -71,6 +69,8 @@ def build_app():
 @hosts([host])
 def server():
     """Start the webapp server."""
+    start_nginx()
+    start_docker_gen()
     with cd('gdmap'):
         run(
             "sudo docker run --name app-instance -d -P"
