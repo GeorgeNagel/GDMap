@@ -106,6 +106,7 @@ $ hostenv/bin/fab docker_cleanup
 1. Create new droplet, change password.
     
     Point dns records in namecheap to ip address of droplet.
+    (My Account) -> (Manage Domains) -> (All Host Records)
 
     ```
             Hostname=@   IP/URL=http://www.goldenroadmap.com/   Record=URL Redirect TTL=1800
@@ -137,7 +138,7 @@ $ hostenv/bin/fab docker_cleanup
 
     ```bash
     $ sudo docker run -d --name elasticsearch elasticsearch:1.4.2
-    $ sudo docker run -d --name mongodb dockerfile/mongodb
+    $ sudo docker run -d --name mongodb library/mongo:3
     $ source scripts/start_nginx.sh
     $ source scripts/start_docker_gen.sh
     ```
